@@ -303,6 +303,27 @@ img, svg { display: block; max-width: 100%; }
 .hero__subtitle { margin-top: 20px; font-size: clamp(1rem, .4vw + .9rem, 1.15rem); line-height: 1.55; color: var(--color-text-muted-dark); max-width: 480px; }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
 
+.hero__badge {
+  /* flex (not inline-flex) makes this a block-level box, so it always
+     starts on its own line below the eyebrow — the eyebrow above is itself
+     inline-flex, so an inline-flex badge would sit right next to it on wide
+     screens instead of wrapping. width: fit-content keeps it pill-sized
+     instead of stretching to the full block width. */
+  display: flex; width: -webkit-fit-content; width: fit-content;
+  align-items: center; gap: 7px;
+  max-width: 100%; margin-top: 16px; padding: 7px 14px; border-radius: 999px;
+  background: rgba(254,196,0,.12); border: 1px solid rgba(254,196,0,.35);
+  color: var(--color-brand); font-size: 12.5px; font-weight: 600; line-height: 1.35;
+}
+/* Guards against wrapping on the narrowest phones (≤340px) without ever
+   truncating the text: the pill switches to two lines instead of overflowing,
+   with the icon pinned to the top so it doesn't float oddly between lines. */
+.hero__badge svg { flex: none; }
+@media (max-width: 340px) {
+  .hero__badge { align-items: flex-start; border-radius: 14px; padding: 8px 12px; gap: 6px; font-size: 12px; }
+  .hero__badge svg { margin-top: 2px; }
+}
+
 .hero__visual {
   /* Matches video_entrada.mp4's native 720x1280 (9:16) so object-fit: cover
      never has to crop it — a mismatched ratio here cuts off the top/bottom. */
