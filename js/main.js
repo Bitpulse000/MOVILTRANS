@@ -36,6 +36,15 @@
       el.rel = 'noopener noreferrer';
       el.removeAttribute('aria-disabled');
       el.removeAttribute('title');
+      // Google Ads conversion tracking: report the click, then open
+      // WhatsApp ourselves (gtag_report_conversion's own callback does
+      // this) so the tag has a chance to fire before navigation.
+      el.addEventListener('click', function (e) {
+        if (typeof gtag_report_conversion === 'function') {
+          e.preventDefault();
+          gtag_report_conversion(url);
+        }
+      });
     } else {
       el.href = '#';
       el.setAttribute('aria-disabled', 'true');

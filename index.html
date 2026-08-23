@@ -10,7 +10,26 @@
 
     gtag('config', 'AW-18401727477');
   </script>
-  
+
+  <!-- Event snippet for Enviar formulario de clientes potenciales conversion page
+  In your html page, add the snippet and call gtag_report_conversion when someone clicks on the chosen link or button. -->
+  <script>
+  function gtag_report_conversion(url) {
+    var callback = function () {
+      if (typeof(url) != 'undefined') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    };
+    gtag('event', 'conversion', {
+        'send_to': 'AW-18401727477/4S1ACIK1w-YcEPWn0MZE',
+        'value': 1.0,
+        'currency': 'COP',
+        'event_callback': callback
+    });
+    return false;
+  }
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MOVILTRANS LOGISTIC | Transporte de Carga y Logística Nacional</title>
