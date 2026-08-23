@@ -1,0 +1,424 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif; color: #14171C; background: #FAF9F5; -webkit-font-smoothing: antialiased; }
+    h1, h2, h3 { font-family: 'Archivo', system-ui, sans-serif; margin: 0; letter-spacing: -0.01em; }
+    p { margin: 0; }
+    a { color: #14171C; text-decoration: none; }
+    a:hover { color: #E0A800; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ::selection { background: #FEC400; color: #14171C; }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    .nav-links { display: none; }
+    @media (min-width: 860px) {
+      .nav-links { display: flex; }
+    }
+
+    .card-hover { transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s cubic-bezier(.16,1,.3,1), border-color .3s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -18px rgba(20,23,28,0.22); border-color: rgba(254,196,0,0.5) !important; }
+
+    .btn-primary { transition: background .25s ease, transform .25s ease, box-shadow .25s ease; }
+    .btn-primary:hover { background: #E0A800; transform: translateY(-2px); box-shadow: 0 12px 24px -8px rgba(254,196,0,0.45); }
+
+    .btn-outline-dark:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.6) !important; }
+    .btn-outline-light:hover { background: rgba(20,23,28,0.06); border-color: rgba(20,23,28,0.4) !important; }
+    .btn-outline-ink:hover { background: rgba(20,23,28,0.9); color: #FAF9F5 !important; }
+
+    .chip:hover { border-color: #FEC400; background: rgba(254,196,0,0.08); }
+
+    .img-zoom { overflow: hidden; }
+    .img-zoom .zoom-el { transition: transform .7s cubic-bezier(.16,1,.3,1); }
+    .img-zoom:hover .zoom-el { transform: scale(1.06) rotate(0.2deg); }
+
+    .icon-wrap { transition: background .3s ease, color .3s ease; }
+    .card-hover:hover .icon-wrap { background: #FEC400; color: #14171C; }
+  </style>
+</helmet>
+
+<div style="overflow-x: hidden; width: 100%; background: #FAF9F5;">
+
+  <!-- ===================== HEADER + HERO ===================== -->
+  <div style="background: #14171C; width: 100%;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(20px,3vw,28px) clamp(20px,5vw,64px) 0;">
+
+      <header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: clamp(40px,7vw,72px);">
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <strong style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 21px; color: #FAF9F5; letter-spacing: -0.02em;">MOVILTRANS</strong>
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: #FEC400; display: inline-block;"></span>
+          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.18em; color: #FEC400;">LOGISTIC</span>
+        </div>
+
+        <nav class="nav-links" style="align-items: center; gap: 32px;">
+          <a href="#servicios" style="font-size: 14px; font-weight: 500; color: #C9CCD1;">Servicios</a>
+          <a href="#nosotros" style="font-size: 14px; font-weight: 500; color: #C9CCD1;">Nosotros</a>
+          <a href="#cobertura" style="font-size: 14px; font-weight: 500; color: #C9CCD1;">Cobertura</a>
+          <a href="#contacto" style="font-size: 14px; font-weight: 500; color: #C9CCD1;">Contacto</a>
+        </nav>
+
+        <button class="btn-primary" style="background: #FEC400; color: #14171C; font-size: 13px; font-weight: 600; padding: 11px 20px; border-radius: 10px; white-space: nowrap;">Solicitar servicio</button>
+      </header>
+
+      <!-- HERO CONTENT -->
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: clamp(36px,6vw,64px); padding-bottom: clamp(56px,9vw,104px);">
+
+        <div style="flex: 1 1 420px; min-width: 280px;">
+          <div class="reveal" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+            <span style="width: 22px; height: 1px; background: #FEC400;"></span>
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #FEC400; text-transform: uppercase;">Transporte de carga · Cobertura nacional</span>
+          </div>
+
+          <h1 class="reveal" style="font-size: clamp(2.2rem, 3.6vw + 1rem, 3.75rem); font-weight: 800; line-height: 1.08; color: #FAF9F5; max-width: 620px;">Tu carga en movimiento, siempre segura.</h1>
+
+          <p class="reveal" style="margin-top: 20px; font-size: clamp(1rem, 0.4vw + 0.9rem, 1.15rem); line-height: 1.55; color: #A7ACB4; max-width: 460px;">Flota propia, procesos certificados y seguimiento en cada tramo del viaje.</p>
+
+          <div class="reveal" style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px;">
+            <button class="btn-primary" style="background: #FEC400; color: #14171C; font-size: 15px; font-weight: 600; padding: 15px 26px; border-radius: 10px;">Solicitar servicio</button>
+            <button class="btn-outline-dark" style="background: transparent; color: #FAF9F5; font-size: 15px; font-weight: 600; padding: 15px 26px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.28); transition: background .25s ease, border-color .25s ease;">Conocer nuestros servicios</button>
+          </div>
+        </div>
+
+        <div class="reveal img-zoom" style="position: relative; flex: 1 1 380px; min-width: 280px; max-width: 560px; aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden; background: linear-gradient(155deg, #1C2128 0%, #14171C 60%, #0D0F12 100%);">
+          <div class="zoom-el" style="position: absolute; inset: 0;">
+            <div style="position: absolute; top: -8%; left: -25%; width: 90%; height: 16%; background: linear-gradient(90deg, transparent, #FEC400 45%, transparent); transform: rotate(-16deg);"></div>
+            <div style="position: absolute; top: 24%; left: -35%; width: 120%; height: 9%; background: linear-gradient(90deg, transparent, rgba(254,196,0,0.55) 45%, transparent); transform: rotate(-16deg);"></div>
+            <div style="position: absolute; top: 48%; left: -15%; width: 95%; height: 5%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28) 45%, transparent); transform: rotate(-16deg);"></div>
+            <div style="position: absolute; top: 64%; left: -30%; width: 130%; height: 13%; background: linear-gradient(90deg, transparent, rgba(254,196,0,0.35) 45%, transparent); transform: rotate(-16deg);"></div>
+            <div style="position: absolute; top: 85%; left: -20%; width: 100%; height: 6%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15) 45%, transparent); transform: rotate(-16deg);"></div>
+            <div style="position: absolute; right: -18%; bottom: -18%; width: 70%; height: 70%; background: radial-gradient(circle, rgba(254,196,0,0.2), transparent 70%);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SERVICIOS ===================== -->
+  <div id="servicios" style="background: #FAF9F5;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(64px,9vw,112px) clamp(20px,5vw,64px);">
+
+      <div class="reveal" style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px;">
+        <span style="width: 22px; height: 1px; background: #E0A800;"></span>
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #E0A800; text-transform: uppercase;">Servicios</span>
+      </div>
+      <h2 class="reveal" style="font-size: clamp(1.7rem, 2vw + 1rem, 2.5rem); font-weight: 700; line-height: 1.15; max-width: 560px; margin-bottom: clamp(36px,5vw,56px);">Soluciones de transporte para cada tipo de carga.</h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
+
+        <!-- Card 1 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 9h18"/><path d="M7 21v-4"/><path d="M17 21v-4"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Carga Seca</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Mercancía general con manejo especializado en cada entrega.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M12 2l3 3M12 2 9 5"/><path d="M12 22l3-3M12 22l-3-3"/><path d="M2 12h20"/><path d="M2 12l3-3M2 12l3 3"/><path d="M22 12l-3-3M22 12l-3 3"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Carga Refrigerada</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Cadena de frío controlada de origen a destino.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Carga Paletizada</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Unidades paletizadas listas para distribución.</p>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.1-7-11a7 7 0 0 1 14 0c0 5.9-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Última Milla</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Entregas puerta a puerta con seguimiento en vivo.</p>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2 21 6 17 10"/><path d="M3 12V6h18"/><path d="M7 22 3 18l4-4"/><path d="M21 12v6H3"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Logística Inversa</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Recolección y devolución de mercancía sin fricción.</p>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-6 9 6v12"/><path d="M7 21v-7h10v7"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Almacenamiento</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Bodegaje temporal integrado a la operación.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CIFRAS ===================== -->
+  <div style="background: #14171C;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(56px,8vw,96px) clamp(20px,5vw,64px);">
+      <div class="reveal" style="display: flex; align-items: baseline; gap: 8px; margin-bottom: clamp(32px,5vw,52px);">
+        <span style="width: 22px; height: 1px; background: #FEC400;"></span>
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #FEC400; text-transform: uppercase;">MOVILTRANS en números</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px;">
+        <div class="reveal">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.6rem); color: #FEC400; line-height: 1;">+[15]</div>
+          <div style="font-size: 14px; color: #A7ACB4; margin-top: 10px;">Años de experiencia</div>
+        </div>
+        <div class="reveal">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.6rem); color: #FEC400; line-height: 1;">+[120]</div>
+          <div style="font-size: 14px; color: #A7ACB4; margin-top: 10px;">Vehículos en flota</div>
+        </div>
+        <div class="reveal">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.6rem); color: #FEC400; line-height: 1;">+[500]</div>
+          <div style="font-size: 14px; color: #A7ACB4; margin-top: 10px;">Clientes activos</div>
+        </div>
+        <div class="reveal">
+          <div style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 4vw, 3.6rem); color: #FEC400; line-height: 1;">Nacional</div>
+          <div style="font-size: 14px; color: #A7ACB4; margin-top: 10px;">Cobertura en el país</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== POR QUÉ MOVILTRANS ===================== -->
+  <div id="nosotros" style="background: #FAF9F5;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(64px,9vw,112px) clamp(20px,5vw,64px);">
+
+      <div class="reveal" style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px;">
+        <span style="width: 22px; height: 1px; background: #E0A800;"></span>
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #E0A800; text-transform: uppercase;">Por qué MOVILTRANS</span>
+      </div>
+      <h2 class="reveal" style="font-size: clamp(1.7rem, 2vw + 1rem, 2.5rem); font-weight: 700; line-height: 1.15; max-width: 560px; margin-bottom: clamp(36px,5vw,56px);">Confianza que se transporta.</h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
+
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6v5c0 5-3.5 9-8 11-4.5-2-8-6-8-11V6l8-4Z"/><path d="M9 12l2 2 4-4.5"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Seguridad</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Protocolos y seguros vigentes en cada envío.</p>
+        </div>
+
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.5 11 15l4.5-5.5"/><rect x="3.5" y="3.5" width="17" height="17" rx="4"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Cumplimiento</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Entregas a tiempo, sin excepciones.</p>
+        </div>
+
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Experiencia</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Más de [15] años moviendo carga por el país.</p>
+        </div>
+
+        <div class="reveal card-hover" style="background: #FFFFFF; border: 1px solid rgba(20,23,28,0.08); border-radius: 16px; padding: 28px 24px;">
+          <div class="icon-wrap" style="width: 44px; height: 44px; border-radius: 10px; background: rgba(20,23,28,0.05); color: #14171C; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.1-7-11a7 7 0 0 1 14 0c0 5.9-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          </div>
+          <h3 style="font-size: 17px; font-weight: 700; margin-bottom: 8px;">Cobertura</h3>
+          <p style="font-size: 14px; line-height: 1.5; color: #5B6068;">Presencia en las principales rutas nacionales.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== OPERACIÓN ===================== -->
+  <div style="background: #F1EFE8;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(64px,9vw,112px) clamp(20px,5vw,64px);">
+      <div style="display: flex; flex-wrap: wrap; gap: clamp(40px,6vw,72px); align-items: center;">
+
+        <div class="reveal img-zoom" style="position: relative; flex: 1 1 380px; min-width: 280px; aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden; background: linear-gradient(160deg, #1C2128 0%, #14171C 65%, #0D0F12 100%);">
+          <div class="zoom-el" style="position: absolute; inset: 0;">
+            <div style="position: absolute; top: 10%; left: -20%; width: 90%; height: 12%; background: linear-gradient(90deg, transparent, #FEC400 45%, transparent); transform: rotate(-10deg);"></div>
+            <div style="position: absolute; top: 40%; left: -30%; width: 120%; height: 8%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22) 45%, transparent); transform: rotate(-10deg);"></div>
+            <div style="position: absolute; top: 66%; left: -25%; width: 110%; height: 15%; background: linear-gradient(90deg, transparent, rgba(254,196,0,0.32) 45%, transparent); transform: rotate(-10deg);"></div>
+            <div style="position: absolute; left: -10%; bottom: -20%; width: 60%; height: 60%; background: radial-gradient(circle, rgba(254,196,0,0.16), transparent 70%);"></div>
+          </div>
+        </div>
+
+        <div style="flex: 1 1 380px; min-width: 280px;">
+          <div class="reveal" style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px;">
+            <span style="width: 22px; height: 1px; background: #E0A800;"></span>
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #E0A800; text-transform: uppercase;">Cómo trabajamos</span>
+          </div>
+          <h2 class="reveal" style="font-size: clamp(1.6rem, 1.8vw + 1rem, 2.25rem); font-weight: 700; line-height: 1.15; margin-bottom: clamp(28px,4vw,40px);">Un proceso simple, de punta a punta.</h2>
+
+          <div class="reveal" style="display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-top: 1px solid rgba(20,23,28,0.1);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 26px; color: rgba(20,23,28,0.18); min-width: 40px;">01</span>
+            <div><h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Solicitud</h3><p style="font-size: 13.5px; color: #5B6068; line-height: 1.5;">Cuéntanos qué necesitas transportar y cuándo.</p></div>
+          </div>
+          <div class="reveal" style="display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-top: 1px solid rgba(20,23,28,0.1);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 26px; color: rgba(20,23,28,0.18); min-width: 40px;">02</span>
+            <div><h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Asignación</h3><p style="font-size: 13.5px; color: #5B6068; line-height: 1.5;">Elegimos la unidad y ruta óptima para tu carga.</p></div>
+          </div>
+          <div class="reveal" style="display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-top: 1px solid rgba(20,23,28,0.1);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 26px; color: rgba(20,23,28,0.18); min-width: 40px;">03</span>
+            <div><h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Tránsito monitoreado</h3><p style="font-size: 13.5px; color: #5B6068; line-height: 1.5;">Seguimiento activo durante todo el recorrido.</p></div>
+          </div>
+          <div class="reveal" style="display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-top: 1px solid rgba(20,23,28,0.1); border-bottom: 1px solid rgba(20,23,28,0.1);">
+            <span style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 26px; color: rgba(20,23,28,0.18); min-width: 40px;">04</span>
+            <div><h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px;">Entrega confirmada</h3><p style="font-size: 13.5px; color: #5B6068; line-height: 1.5;">Confirmación y soporte documental al finalizar.</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COBERTURA ===================== -->
+  <div id="cobertura" style="background: #FAF9F5;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(64px,9vw,112px) clamp(20px,5vw,64px);">
+      <div style="display: flex; flex-wrap: wrap-reverse; gap: clamp(40px,6vw,72px); align-items: center;">
+
+        <div style="flex: 1 1 380px; min-width: 280px;">
+          <div class="reveal" style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px;">
+            <span style="width: 22px; height: 1px; background: #E0A800;"></span>
+            <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.14em; color: #E0A800; text-transform: uppercase;">Cobertura</span>
+          </div>
+          <h2 class="reveal" style="font-size: clamp(1.6rem, 1.8vw + 1rem, 2.25rem); font-weight: 700; line-height: 1.15; margin-bottom: 12px;">Presentes en las rutas que mueven el país.</h2>
+          <p class="reveal" style="font-size: 13px; font-style: italic; color: #8A8F97; margin-bottom: 26px;">Ejemplo — reemplaza con tus zonas reales de cobertura.</p>
+
+          <div class="reveal" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 1]</span>
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 2]</span>
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 3]</span>
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 4]</span>
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 5]</span>
+            <span class="chip" style="border: 1px dashed rgba(20,23,28,0.25); border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 500; color: #14171C;">[Ciudad 6]</span>
+          </div>
+        </div>
+
+        <div class="reveal" style="position: relative; flex: 1 1 380px; min-width: 280px; aspect-ratio: 1 / 1; border-radius: 20px; overflow: hidden; background: #14171C; background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 20px 20px;">
+          <svg viewBox="0 0 400 400" style="width: 100%; height: 100%; position: absolute; inset: 0;" fill="none">
+            <path d="M30 350 C 100 350, 100 250, 170 225 C 240 200, 240 130, 305 95 C 345 74, 365 55, 380 25" stroke="#FEC400" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 11" opacity="0.85"/>
+            <circle cx="30" cy="350" r="7" fill="#FEC400"/>
+            <circle cx="170" cy="225" r="5" fill="#FAF9F5" opacity="0.85"/>
+            <circle cx="305" cy="95" r="5" fill="#FAF9F5" opacity="0.85"/>
+            <circle cx="380" cy="25" r="7" fill="#FEC400"/>
+          </svg>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CTA FINAL ===================== -->
+  <div id="contacto" style="background: #FEC400;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(56px,8vw,96px) clamp(20px,5vw,64px); text-align: center;">
+      <h2 class="reveal" style="font-size: clamp(1.8rem, 2.6vw + 1rem, 3rem); font-weight: 800; color: #14171C; line-height: 1.12; max-width: 640px; margin: 0 auto 14px;">¿Listo para mover tu carga?</h2>
+      <p class="reveal" style="font-size: 15px; color: rgba(20,23,28,0.72); margin-bottom: 32px;">Cotiza tu envío y recibe respuesta el mismo día.</p>
+
+      <div class="reveal" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+        <button class="btn-outline-ink" style="background: #14171C; color: #FEC400; font-size: 15px; font-weight: 700; padding: 15px 28px; border-radius: 10px; transition: opacity .25s ease;">Solicitar servicio</button>
+        <button class="btn-outline-light" style="background: transparent; color: #14171C; font-size: 15px; font-weight: 700; padding: 15px 28px; border-radius: 10px; border: 1.5px solid rgba(20,23,28,0.4); display: inline-flex; align-items: center; gap: 9px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.55L3 20l1.02-5.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 10.5c.3 2.4 2.6 4.7 5 5"/></svg>
+          Escribir por WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <div style="background: #14171C;">
+    <div style="max-width: 1240px; margin: 0 auto; padding: clamp(48px,7vw,72px) clamp(20px,5vw,64px) clamp(24px,4vw,32px);">
+
+      <div style="display: flex; flex-wrap: wrap; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+
+        <div style="flex: 1 1 240px; min-width: 220px;">
+          <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 14px;">
+            <strong style="font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 19px; color: #FAF9F5;">MOVILTRANS</strong>
+            <span style="width: 5px; height: 5px; border-radius: 50%; background: #FEC400; display: inline-block;"></span>
+            <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.18em; color: #FEC400;">LOGISTIC</span>
+          </div>
+          <p style="font-size: 13.5px; color: #8A8F97; line-height: 1.5; max-width: 260px;">Transporte de carga con cobertura nacional.</p>
+          <div style="display: flex; gap: 12px; margin-top: 22px;">
+            <a href="#" style="width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: #C9CCD1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+            <a href="#" style="width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: #C9CCD1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M15 8h2V4h-2c-2 0-3.5 1.6-3.5 3.6V10H9v4h2.5v6h4v-6H18l.5-4h-3V8Z"/></svg></a>
+            <a href="#" style="width: 34px; height: 34px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: #C9CCD1;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 10.5v6"/><circle cx="7" cy="7.3" r="0.6" fill="currentColor"/><path d="M11.5 16.5v-4a2 2 0 0 1 4 0v4"/><path d="M11.5 10.5v6"/></svg></a>
+          </div>
+        </div>
+
+        <div style="flex: 1 1 140px; min-width: 140px;">
+          <h3 style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8F97; margin-bottom: 16px;">Empresa</h3>
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <a href="#nosotros" style="font-size: 14px; color: #C9CCD1;">Nosotros</a>
+            <a href="#servicios" style="font-size: 14px; color: #C9CCD1;">Servicios</a>
+            <a href="#cobertura" style="font-size: 14px; color: #C9CCD1;">Cobertura</a>
+          </div>
+        </div>
+
+        <div style="flex: 1 1 200px; min-width: 200px;">
+          <h3 style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8A8F97; margin-bottom: 16px;">Contacto</h3>
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <span style="font-size: 14px; color: #C9CCD1;">[Teléfono / WhatsApp]</span>
+            <span style="font-size: 14px; color: #C9CCD1;">[correo@moviltrans.com]</span>
+            <span style="font-size: 14px; color: #C9CCD1;">[Dirección de la empresa]</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 22px;">
+        <span style="font-size: 12.5px; color: #6B7078;">© 2026 MOVILTRANS LOGISTIC. Todos los derechos reservados.</span>
+        <div style="display: flex; gap: 20px;">
+          <a href="#" style="font-size: 12.5px; color: #6B7078;">Política de privacidad</a>
+          <a href="#" style="font-size: 12.5px; color: #6B7078;">Términos</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    const els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('in'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    els.forEach((el) => io.observe(el));
+  }
+}
+</script>
+</body>
+</html>

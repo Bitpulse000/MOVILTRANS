@@ -1,0 +1,549 @@
+/* =========================================================
+   MOVILTRANS LOGISTIC — Landing page styles
+   Design tokens ported 1:1 from the approved visual design.
+   ========================================================= */
+
+:root {
+  /* Brand */
+  --color-brand: #FEC400;
+  --color-brand-deep: #E0A800;
+  /* Same brand hue, darkened for AA text contrast on light backgrounds
+     (the eyebrow labels) — #E0A800 on #FAF9F5 is only ~2:1. */
+  --color-brand-text: #8F6A00;
+
+  /* Neutrals */
+  --color-ink: #14171C;
+  --color-ink-2: #1C2128;
+  --color-paper: #FAF9F5;
+  --color-paper-2: #F1EFE8;
+  --color-line-light: rgba(20, 23, 28, 0.10);
+  --color-line-dark: rgba(255, 255, 255, 0.12);
+  --color-text-muted: #5B6068;
+  --color-text-muted-dark: #A7ACB4;
+  --color-text-faint-dark: #8A8F97;
+  --color-text-faint-dark-2: #6B7078;
+
+  /* Type */
+  --font-display: 'Archivo', system-ui, -apple-system, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  /* Layout */
+  --container-max: 1240px;
+  --container-pad: clamp(20px, 5vw, 64px);
+  --section-pad-y: clamp(64px, 9vw, 112px);
+  --section-pad-y-tight: clamp(56px, 8vw, 96px);
+
+  /* Shape */
+  --radius-card: 16px;
+  --radius-panel: 20px;
+  --radius-control: 10px;
+
+  /* Motion */
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --dur-fast: .25s;
+  --dur-base: .3s;
+  --dur-reveal: .7s;
+}
+
+/* ---------- Reset ---------- */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+a { color: var(--color-ink); text-decoration: none; }
+a:hover { color: var(--color-brand-deep); }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+img, svg { display: block; max-width: 100%; }
+::selection { background: var(--color-brand); color: var(--color-ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---------- Layout helpers ---------- */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+}
+.section { padding-top: var(--section-pad-y); padding-bottom: var(--section-pad-y); }
+.section--tight { padding-top: var(--section-pad-y-tight); padding-bottom: var(--section-pad-y-tight); }
+.section--dark { background: var(--color-ink); color: var(--color-paper); }
+.section--paper { background: var(--color-paper); }
+.section--paper-2 { background: var(--color-paper-2); }
+.section--brand { background: var(--color-brand); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; left: 12px; top: -60px; z-index: 200;
+  background: var(--color-brand); color: var(--color-ink);
+  padding: 10px 16px; border-radius: var(--radius-control);
+  font-weight: 600; font-size: 14px; transition: top var(--dur-base) var(--ease-out);
+}
+.skip-link:focus { top: 12px; color: var(--color-ink); }
+
+/* ---------- Colombia corner ribbon ----------
+   Sizes itself to the empty margin OUTSIDE the centered container
+   rather than a fixed pixel size. Below 1240px the container fills
+   the viewport (minus its own padding) right up to the header's nav
+   / tracking field / hamburger, so (100vw - 1240px)/2 is negative
+   there and the clamp floor (56px, the old mobile-only size) wins —
+   small and safely clear of header controls, same as before. Past
+   1240px real empty margin opens up outside the container, so the
+   ribbon grows to fill exactly that margin (never past the
+   container's own edge) — bigger on wide desktop screens without
+   ever overlapping header content. */
+.co-ribbon {
+  position: fixed; top: 0; right: 0; z-index: 110;
+  width: clamp(56px, calc((100vw - 1240px) / 2), 150px);
+  height: clamp(56px, calc((100vw - 1240px) / 2), 150px);
+  overflow: hidden; pointer-events: none;
+}
+.co-ribbon span {
+  position: absolute; top: 11%; right: -30%; width: 143%; height: 29%;
+  transform: rotate(45deg); transform-origin: center;
+  background: linear-gradient(to bottom, #FCD116 0 50%, #003893 50% 75%, #CE1126 75% 100%);
+  box-shadow: 0 3px 10px rgba(0,0,0,.3);
+}
+
+/* ---------- Type utilities ---------- */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-body); font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--color-brand-text);
+}
+.eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--color-brand-text); }
+.eyebrow--on-dark { color: var(--color-brand); }
+.eyebrow--on-dark::before { background: var(--color-brand); }
+
+.section-title {
+  font-size: clamp(1.7rem, 2vw + 1rem, 2.5rem);
+  font-weight: 700; line-height: 1.15; max-width: 560px;
+  margin-top: 14px;
+}
+.section-title--tight { font-size: clamp(1.6rem, 1.8vw + 1rem, 2.25rem); margin-top: 12px; }
+.section-lede { margin-top: 12px; font-size: 13px; font-style: italic; color: var(--color-text-faint-dark); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  font-size: 15px; font-weight: 600; padding: 15px 26px; border-radius: var(--radius-control);
+  transition: background var(--dur-fast) ease, transform var(--dur-fast) ease, box-shadow var(--dur-fast) ease, border-color var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+.btn:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+.btn-sm { font-size: 13px; padding: 11px 20px; min-height: 44px; }
+.btn-lg { font-size: 16.5px; padding: 18px 32px; }
+
+.btn-primary { background: var(--color-brand); color: var(--color-ink); font-weight: 700; box-shadow: 0 10px 22px -10px rgba(254,196,0,.55); }
+.btn-primary:hover { background: var(--color-brand-deep); color: var(--color-ink); transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(254,196,0,.55); }
+
+.btn-outline-dark { background: transparent; color: var(--color-paper); border: 1px solid rgba(255,255,255,.28); }
+.btn-outline-dark:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.6); color: var(--color-paper); }
+
+.btn-outline-light { background: transparent; color: var(--color-ink); border: 1.5px solid rgba(20,23,28,.4); }
+.btn-outline-light:hover { background: rgba(20,23,28,.06); border-color: rgba(20,23,28,.7); color: var(--color-ink); }
+
+.btn-ink { background: var(--color-ink); color: var(--color-brand); font-weight: 700; box-shadow: 0 10px 22px -10px rgba(20,23,28,.4); }
+.btn-ink:hover { opacity: .92; color: var(--color-brand); transform: translateY(-2px); box-shadow: 0 16px 30px -8px rgba(20,23,28,.45); }
+
+.btn[aria-disabled="true"] { cursor: not-allowed; }
+
+/* ---------- Icons ---------- */
+.icon-wrap {
+  width: 44px; height: 44px; border-radius: var(--radius-control);
+  background: rgba(20,23,28,.05); color: var(--color-ink);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+  transition: background var(--dur-base) ease, color var(--dur-base) ease;
+}
+.card:hover .icon-wrap { background: var(--color-brand); color: var(--color-ink); }
+
+/* ---------- Reveal-on-scroll ---------- */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out); }
+.reveal.in-view { opacity: 1; transform: translateY(0); }
+.js-disabled .reveal { opacity: 1; transform: none; }
+
+/* =========================================================
+   HEADER / NAV
+   ========================================================= */
+.site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(20, 23, 28, .92); backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-base) ease, box-shadow var(--dur-base) ease;
+}
+.site-header.is-scrolled { border-bottom-color: rgba(255,255,255,.08); box-shadow: 0 8px 24px -16px rgba(0,0,0,.6); }
+
+.site-header__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding-top: 16px; padding-bottom: 16px;
+}
+
+.brand { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.brand__logo { height: 34px; width: auto; display: block; flex: none; }
+.brand--sm .brand__logo { height: 28px; }
+.brand__name { font-family: var(--font-display); font-weight: 800; font-size: 21px; color: var(--color-paper); letter-spacing: -0.02em; }
+.brand__suffix { font-family: var(--font-display); font-weight: 800; font-size: 21px; color: var(--color-brand); letter-spacing: -0.02em; }
+.brand--sm .brand__name, .brand--sm .brand__suffix { font-size: 19px; }
+.brand__dot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-brand); display: inline-block; flex: none; }
+
+/* The header brand lockup (logo + "MOVILTRANS · LOGISTIC") was wide
+   enough on small phones to push the hamburger button off-screen —
+   it was never behind the ribbon, it was clipped by overflow-x:hidden.
+   Shrink it here, well before that happens. */
+@media (max-width: 480px) {
+  .brand { gap: 7px; }
+  .brand__logo { height: 26px; }
+  .brand__name, .brand__suffix { font-size: 16px; }
+  .site-header__bar { gap: 8px; }
+}
+
+.nav-links { display: none; align-items: center; gap: 22px; }
+.nav-links a { font-size: 14px; font-weight: 500; color: #C9CCD1; transition: color var(--dur-fast) ease; }
+.nav-links a:hover { color: var(--color-brand); }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+.nav-toggle {
+  position: relative; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: var(--radius-control);
+  border: 1px solid rgba(255,255,255,.18); color: var(--color-paper);
+}
+.nav-toggle:hover { background: rgba(255,255,255,.08); }
+/* Invisible 44x44 tap target — the visible 42px box stays the same size. */
+.nav-toggle::after { content: ""; position: absolute; inset: -1px; }
+.nav-toggle__icon { position: relative; width: 18px; height: 12px; }
+.nav-toggle__icon span {
+  position: absolute; left: 0; width: 100%; height: 2px; background: currentColor; border-radius: 2px;
+  transition: transform var(--dur-base) var(--ease-out), opacity var(--dur-base) ease, top var(--dur-base) var(--ease-out);
+}
+.nav-toggle__icon span:nth-child(1) { top: 0; }
+.nav-toggle__icon span:nth-child(2) { top: 5px; }
+.nav-toggle__icon span:nth-child(3) { top: 10px; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon span:nth-child(1) { top: 5px; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] .nav-toggle__icon span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
+
+.mobile-menu {
+  display: grid; grid-template-rows: 0fr; overflow: hidden;
+  background: var(--color-ink); border-bottom: 1px solid rgba(255,255,255,.08);
+  transition: grid-template-rows var(--dur-base) var(--ease-out);
+}
+.mobile-menu.is-open { grid-template-rows: 1fr; }
+.mobile-menu__inner { min-height: 0; }
+.mobile-menu__list { display: flex; flex-direction: column; padding: 8px var(--container-pad) 20px; }
+.mobile-menu__list a {
+  padding: 14px 4px; font-size: 15px; font-weight: 500; color: #E4E6EA;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.mobile-menu__list a:hover { color: var(--color-brand); }
+.mobile-menu__cta { margin-top: 16px; }
+.mobile-menu__track-label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--color-text-faint-dark); margin-bottom: 10px; }
+
+/* Header "Rastrea tu envío" — compact, desktop only (mobile uses the menu's full-width version) */
+.header-track { display: none; align-items: center; gap: 8px; }
+.header-track__input {
+  width: 160px; min-width: 0; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius-control); padding: 9px 12px; color: var(--color-paper);
+  font-family: var(--font-body); font-size: 13px;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.header-track__input::placeholder { color: var(--color-text-faint-dark); }
+.header-track__input:focus { outline: none; border-color: var(--color-brand); background: rgba(255,255,255,.12); }
+
+/* Raised from 860px: at 860-1179px, brand + full nav + tracking form
+   don't fit in one row (measured ~950px of content vs ~800px available).
+   Below 1180px we keep the hamburger + mobile menu, which already has
+   room for everything and was verified to work at those widths. */
+@media (min-width: 1180px) {
+  .nav-links { display: flex; }
+  .nav-toggle { display: none; }
+  .mobile-menu { display: none; }
+  .header-track { display: flex; }
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.hero {
+  color: var(--color-paper);
+  background-color: var(--color-ink);
+  background-image:
+    linear-gradient(100deg, rgba(20,23,28,.95) 0%, rgba(20,23,28,.88) 40%, rgba(20,23,28,.62) 100%),
+    url('../assets/fondo_bodega.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.hero__grid {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: clamp(36px, 6vw, 64px);
+  padding-top: clamp(48px, 7vw, 80px);
+  padding-bottom: clamp(56px, 9vw, 104px);
+}
+.hero__content { flex: 1 1 420px; min-width: 280px; }
+.hero__title {
+  font-size: clamp(2.1rem, 3.4vw + 1rem, 3.6rem); font-weight: 800; line-height: 1.08;
+  color: var(--color-paper); max-width: 640px; margin-top: 20px;
+}
+.hero__subtitle { margin-top: 20px; font-size: clamp(1rem, .4vw + .9rem, 1.15rem); line-height: 1.55; color: var(--color-text-muted-dark); max-width: 480px; }
+.hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+
+.hero__visual {
+  /* Matches video_entrada.mp4's native 720x1280 (9:16) so object-fit: cover
+     never has to crop it — a mismatched ratio here cuts off the top/bottom. */
+  position: relative; flex: 1 1 320px; min-width: 260px; max-width: 400px;
+  aspect-ratio: 9 / 16; border-radius: var(--radius-panel); overflow: hidden;
+  background: linear-gradient(155deg, var(--color-ink-2) 0%, var(--color-ink) 60%, #0D0F12 100%);
+}
+.hero__visual-inner { position: absolute; inset: 0; transition: transform .7s var(--ease-out); }
+.hero__visual:hover .hero__visual-inner { transform: scale(1.05); }
+/* Sits on top of the gradient/speed-line graphic above — that graphic
+   stays as the fallback if the video is slow to load or fails. */
+.hero__video {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  transition: transform .7s var(--ease-out);
+}
+.hero__visual:hover .hero__video { transform: scale(1.05); }
+.speed-line { position: absolute; left: -30%; width: 120%; transform: rotate(-16deg); }
+.speed-line--1 { top: -8%; height: 16%; background: linear-gradient(90deg, transparent, var(--color-brand) 45%, transparent); }
+.speed-line--2 { top: 24%; height: 9%; background: linear-gradient(90deg, transparent, rgba(254,196,0,.55) 45%, transparent); }
+.speed-line--3 { top: 48%; height: 5%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.28) 45%, transparent); }
+.speed-line--4 { top: 64%; height: 13%; background: linear-gradient(90deg, transparent, rgba(254,196,0,.35) 45%, transparent); }
+.speed-line--5 { top: 85%; height: 6%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.15) 45%, transparent); }
+.glow-spot { position: absolute; right: -18%; bottom: -18%; width: 70%; height: 70%; background: radial-gradient(circle, rgba(254,196,0,.2), transparent 70%); }
+.glow-spot--left { left: -10%; right: auto; }
+
+/* Operación section — smaller variant graphic (visual variety vs. hero) */
+.speed-line--op-1 { top: 10%; height: 12%; background: linear-gradient(90deg, transparent, var(--color-brand) 45%, transparent); }
+.speed-line--op-2 { top: 40%; height: 8%; background: linear-gradient(90deg, transparent, rgba(255,255,255,.22) 45%, transparent); }
+.speed-line--op-3 { top: 66%; height: 15%; background: linear-gradient(90deg, transparent, rgba(254,196,0,.32) 45%, transparent); }
+
+/* =========================================================
+   CARD GRIDS (services / benefits)
+   ========================================================= */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: clamp(36px, 5vw, 56px); }
+.card {
+  background: #FFFFFF; border: 1px solid var(--color-line-light); border-radius: var(--radius-card); padding: 28px 24px;
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) ease;
+}
+.card:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -18px rgba(20,23,28,.22); border-color: rgba(254,196,0,.5); }
+.card__title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.card__text { font-size: 14px; line-height: 1.5; color: var(--color-text-muted); }
+
+/* Mobile: stacked icon-on-top cards took ~180px each — 8 services +
+   4+4 more meant a very long scroll. A compact icon-left row reads
+   just as clearly and takes about half the height per card. */
+@media (max-width: 640px) {
+  .card-grid { gap: 10px; margin-top: 28px; }
+  .card { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; }
+  .card .icon-wrap { width: 36px; height: 36px; margin-bottom: 0; }
+  .card .icon-wrap svg { width: 18px; height: 18px; }
+  .card__title { font-size: 15px; margin-bottom: 3px; }
+  .card__text { font-size: 13px; }
+}
+
+/* =========================================================
+   STATS — two dominant numbers + a short capability list.
+   Kept visually distinct on purpose: real counts get the big
+   typographic treatment, qualitative claims (flota propia,
+   cobertura) don't pretend to be numbers.
+   ========================================================= */
+.stats-hero { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 72px); align-items: stretch; margin-top: clamp(32px, 5vw, 52px); }
+
+.stats-hero__numbers { flex: 1 1 380px; display: flex; flex-wrap: wrap; gap: clamp(36px, 6vw, 72px); }
+.stat-big__value { font-family: var(--font-display); font-weight: 800; font-size: clamp(3rem, 6.5vw, 5.25rem); color: var(--color-brand); line-height: 1; }
+.stat-big__label { font-size: 15px; color: var(--color-text-muted-dark); margin-top: 12px; }
+
+.stats-hero__features {
+  flex: 1 1 260px; display: flex; flex-direction: column; justify-content: center;
+  border-top: 1px solid var(--color-line-dark); padding-top: clamp(24px, 4vw, 32px);
+}
+@media (min-width: 700px) {
+  .stats-hero__features { border-top: none; border-left: 1px solid var(--color-line-dark); padding-top: 0; padding-left: clamp(28px, 4vw, 44px); }
+}
+.stat-feature { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--color-line-dark); }
+.stat-feature:last-child { border-bottom: 1px solid var(--color-line-dark); }
+.stat-feature__icon {
+  width: 38px; height: 38px; border-radius: 10px; flex: none;
+  background: rgba(254,196,0,.12); color: var(--color-brand);
+  display: flex; align-items: center; justify-content: center;
+}
+.stat-feature__text { font-size: 14.5px; font-weight: 500; color: #E4E6EA; }
+
+/* =========================================================
+   OPERATION (split composition)
+   ========================================================= */
+.split { display: flex; flex-wrap: wrap; gap: clamp(40px, 6vw, 72px); align-items: center; }
+/* Cobertura's 4-card grid is shorter than the map panel — align both
+   to the same top edge instead of centering (which floated the map
+   above the cards). */
+#cobertura .split { align-items: flex-start; }
+.split--reverse { flex-wrap: wrap-reverse; }
+.split__media {
+  position: relative; flex: 1 1 380px; min-width: 280px; aspect-ratio: 4 / 3;
+  border-radius: var(--radius-panel); overflow: hidden;
+  background: linear-gradient(160deg, var(--color-ink-2) 0%, var(--color-ink) 65%, #0D0F12 100%);
+}
+.split__img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.split__media--square {
+  aspect-ratio: 1 / 1; background-color: var(--color-ink);
+  background-image: url('../assets/co-dotted.svg'), radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+  background-size: 95% auto, 20px 20px;
+  background-position: center, 0 0;
+  background-repeat: no-repeat, repeat;
+}
+.split__content { flex: 1 1 380px; min-width: 280px; }
+
+.steps { margin-top: clamp(28px, 4vw, 40px); }
+.step { display: flex; align-items: flex-start; gap: 20px; padding: 18px 0; border-top: 1px solid var(--color-line-light); }
+.step:last-child { border-bottom: 1px solid var(--color-line-light); }
+.step__num { font-family: var(--font-display); font-weight: 800; font-size: 26px; color: rgba(20,23,28,.18); min-width: 40px; }
+.step__title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.step__text { font-size: 13.5px; color: var(--color-text-muted); line-height: 1.5; }
+
+/* =========================================================
+   COVERAGE
+   ========================================================= */
+.cobertura-content { flex: 1.3 1 420px; }
+/* Fixed 2 columns (not auto-fit) so the 5th card sits alone in its
+   row instead of stretching to fill it. */
+.cobertura-grid { grid-template-columns: 1fr; margin-top: 28px; }
+@media (min-width: 480px) {
+  .cobertura-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.cobertura-media { flex: 1 1 280px; max-width: 340px; }
+.route-map { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* =========================================================
+   CTA FINAL
+   ========================================================= */
+/* Subtle dotted texture behind the CTA — purely decorative, layered
+   with ::before so it adds zero height to the section (position:
+   absolute, inset:0) while breaking up the flat brand-yellow block
+   that otherwise reads as empty on wide viewports. */
+.cta-final-section { position: relative; overflow: hidden; }
+.cta-final-section::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(20,23,28,.14) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 100% at 50% 50%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 100% at 50% 50%, #000 0%, transparent 75%);
+}
+.cta-final { position: relative; text-align: center; }
+.cta-final__title { font-size: clamp(1.8rem, 2.6vw + 1rem, 3rem); font-weight: 800; color: var(--color-ink); line-height: 1.12; max-width: 640px; margin: 14px auto 0; }
+.cta-final__subtitle { font-size: 15px; color: rgba(20,23,28,.72); margin-top: 14px; }
+.cta-final__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 32px; }
+
+/* ---------- Tracking form fields (mobile menu's "Rastrea tu envío") ---------- */
+.tracking-widget__form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.tracking-widget__input {
+  flex: 1 1 200px; min-width: 0;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.18);
+  border-radius: var(--radius-control); padding: 13px 16px;
+  color: var(--color-paper); font-family: var(--font-body); font-size: 14px;
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+.tracking-widget__input::placeholder { color: var(--color-text-faint-dark); }
+.tracking-widget__input:focus { outline: none; border-color: var(--color-brand); background: rgba(255,255,255,.1); }
+.tracking-widget__submit { flex: 0 0 auto; padding: 13px 22px; }
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.site-footer { background: var(--color-ink); color: var(--color-paper); }
+.footer-top {
+  display: flex; flex-wrap: wrap; gap: 40px;
+  padding-top: clamp(48px, 7vw, 72px); padding-bottom: 40px;
+  border-bottom: 1px solid var(--color-line-dark);
+}
+.footer-col--brand { flex: 1 1 260px; min-width: 220px; }
+.footer-col { flex: 1 1 160px; min-width: 150px; }
+.footer-col__title { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-faint-dark); margin-bottom: 16px; }
+.footer-links { display: flex; flex-direction: column; gap: 11px; }
+/* :not(.btn) so this generic link color doesn't fight the WhatsApp
+   button's own .btn-primary color (dark text on its yellow background). */
+.footer-links a:not(.btn), .footer-links span { font-size: 14px; color: #C9CCD1; }
+.footer-tagline { font-size: 13.5px; color: var(--color-text-faint-dark); line-height: 1.5; max-width: 260px; margin-top: 14px; }
+
+.social-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.social-link {
+  position: relative;
+  width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15);
+  display: flex; align-items: center; justify-content: center; color: #C9CCD1;
+  transition: background var(--dur-fast) ease, color var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-fast) ease;
+}
+/* Invisible 44x44 tap target — the visible 38px box stays the same size. */
+.social-link::after { content: ""; position: absolute; inset: -3px; }
+.social-link:hover { background: var(--color-brand); color: var(--color-ink); border-color: var(--color-brand); transform: translateY(-2px); }
+.social-link[aria-disabled="true"] { cursor: not-allowed; }
+
+.footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 22px; padding-bottom: clamp(24px, 4vw, 32px); }
+.footer-bottom small { font-size: 12.5px; color: var(--color-text-faint-dark); }
+.footer-legal { display: flex; gap: 20px; }
+.footer-legal span { font-size: 12.5px; color: var(--color-text-faint-dark); }
+.footer-legal a { color: var(--color-text-faint-dark); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+/* =========================================================
+   FLOATING WHATSAPP BUTTON
+   ========================================================= */
+.whatsapp-float {
+  position: fixed; right: 20px; bottom: 20px; z-index: 150;
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #25D366; color: #FFFFFF;
+  border-radius: 999px; padding: 14px 20px 14px 14px;
+  box-shadow: 0 12px 28px -10px rgba(20,23,28,.45);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) ease, background var(--dur-fast) ease;
+  animation: wa-breathe 3.2s ease-in-out infinite;
+}
+.whatsapp-float:hover { transform: translateY(-3px); background: #1FBE5C; box-shadow: 0 16px 32px -8px rgba(37,211,102,.55); color: #FFFFFF; }
+.whatsapp-float__icon {
+  width: 30px; height: 30px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.whatsapp-float__label { font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+.whatsapp-float__label--short { display: none; }
+.whatsapp-float[aria-disabled="true"] { cursor: not-allowed; }
+
+@keyframes wa-breathe {
+  0%, 100% { box-shadow: 0 12px 28px -10px rgba(20,23,28,.45), 0 0 0 0 rgba(37,211,102,.45); }
+  50% { box-shadow: 0 12px 28px -10px rgba(20,23,28,.45), 0 0 0 10px rgba(37,211,102,0); }
+}
+
+@media (max-width: 640px) {
+  .whatsapp-float { right: 14px; bottom: 14px; padding: 11px 16px 11px 11px; gap: 8px; }
+  .whatsapp-float__icon { width: 26px; height: 26px; }
+  .whatsapp-float__icon svg { width: 20px; height: 20px; }
+  .whatsapp-float__label { font-size: 12.5px; }
+}
+@media (max-width: 360px) {
+  .whatsapp-float__label--full { display: none; }
+  .whatsapp-float__label--short { display: inline; }
+}
+
+/* =========================================================
+   RESPONSIVE ADAPTATIONS (beyond fluid clamp/auto-fit)
+   ========================================================= */
+@media (max-width: 639px) {
+  .hero__actions .btn,
+  .cta-final__actions .btn { width: 100%; }
+  .split__media { aspect-ratio: 4 / 3.4; }
+}
+
+@media (min-width: 900px) {
+  .card-grid--why { grid-template-columns: repeat(4, 1fr); }
+}
