@@ -451,24 +451,39 @@ img, svg { display: block; max-width: 100%; }
 .route-map { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* =========================================================
-   CTA FINAL
+   UBICACIÓN (mapa)
    ========================================================= */
-/* Subtle dotted texture behind the CTA — purely decorative, layered
-   with ::before so it adds zero height to the section (position:
-   absolute, inset:0) while breaking up the flat brand-yellow block
-   that otherwise reads as empty on wide viewports. */
-.cta-final-section { position: relative; overflow: hidden; }
-.cta-final-section::before {
+/* Same dotted-yellow treatment the old CTA-final section used —
+   purely decorative, layered with ::before so it adds zero height
+   (position: absolute, inset: 0) while breaking up the flat
+   brand-yellow block that otherwise reads as empty on wide viewports. */
+.location-section { position: relative; overflow: hidden; }
+.location-section::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background-image: radial-gradient(rgba(20,23,28,.14) 1.5px, transparent 1.5px);
   background-size: 22px 22px;
   -webkit-mask-image: radial-gradient(ellipse 70% 100% at 50% 50%, #000 0%, transparent 75%);
   mask-image: radial-gradient(ellipse 70% 100% at 50% 50%, #000 0%, transparent 75%);
 }
-.cta-final { position: relative; text-align: center; }
-.cta-final__title { font-size: clamp(1.8rem, 2.6vw + 1rem, 3rem); font-weight: 800; color: var(--color-ink); line-height: 1.12; max-width: 640px; margin: 14px auto 0; }
-.cta-final__subtitle { font-size: 15px; color: rgba(20,23,28,.72); margin-top: 14px; }
-.cta-final__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 32px; }
+.location-section > .container { position: relative; }
+
+/* Default .eyebrow color (dark gold) is tuned for contrast on the
+   paper backgrounds, not the solid brand yellow here — swap it for
+   ink, same as the title/lede below. */
+.location-section .eyebrow { color: var(--color-ink); }
+.location-section .eyebrow::before { background: var(--color-ink); }
+.location-lede { margin-top: 12px; font-size: 15px; line-height: 1.6; color: rgba(20,23,28,.72); max-width: 480px; }
+
+/* Reuses .split__media's flex sizing / aspect-ratio / rounded corners
+   (map on the right on desktop — content is first in source, media
+   second, so it lands there in the row; map on top on mobile via
+   split--reverse's stacking) — just swaps its dark decorative
+   gradient for a real embedded map's framing. */
+.map-embed {
+  background: #FFFFFF; border: 1px solid rgba(20,23,28,.12);
+  box-shadow: 0 22px 44px -26px rgba(20,23,28,.35);
+}
+.map-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
 
 /* ---------- Tracking form fields (mobile menu's "Rastrea tu envío") ---------- */
 .tracking-widget__form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -499,6 +514,12 @@ img, svg { display: block; max-width: 100%; }
 /* :not(.btn) so this generic link color doesn't fight the WhatsApp
    button's own .btn-primary color (dark text on its yellow background). */
 .footer-links a:not(.btn), .footer-links span { font-size: 14px; color: #C9CCD1; }
+.footer-contact-link { display: inline-flex; align-items: center; gap: 9px; }
+.footer-contact-link svg { flex: none; color: var(--color-text-faint-dark); }
+/* Address wraps to two lines — align the pin icon to the first line
+   instead of centering it across both. */
+.footer-contact-link--address { align-items: flex-start; }
+.footer-contact-link--address svg { margin-top: 3px; }
 .footer-tagline { font-size: 13.5px; color: var(--color-text-faint-dark); line-height: 1.5; max-width: 260px; margin-top: 14px; }
 
 .social-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
@@ -557,11 +578,104 @@ img, svg { display: block; max-width: 100%; }
 }
 
 /* =========================================================
+   AMBIENT SECTION BACKGROUNDS
+   The solid-color sections (Servicios down to the footer) read a
+   little flat on their own. Rather than a repeating pattern, each
+   one gets a single soft brand-yellow glow/arc — the same light
+   language as the hero's .glow-spot and the dashed .route-map in
+   Cobertura, just quieter — so the sections feel like one family
+   instead of a spot pattern applied everywhere.
+
+   Technique: a pseudo-element (radial-gradient, no blur — cheap to
+   paint, no JS/reflow) sits behind the section's real content.
+   Giving the section position:relative + overflow:hidden contains
+   it (no horizontal scroll at any width); giving the section's
+   direct .container position:relative is enough to paint it above
+   the ::before, because ::before is first in the box tree and both
+   share the same z-index:auto stacking order (tree order wins) —
+   no z-index juggling needed. Percentage sizing keeps every shape
+   scaling with the section instead of the viewport.
+   ========================================================= */
+
+/* Servicios — twin glows bracket the section (top-right behind the
+   title, a fainter echo bottom-left) since 8 cards fill most of the
+   middle; the light mostly shows in the padding around them. */
+#servicios { position: relative; overflow: hidden; }
+#servicios::before {
+  content: ""; position: absolute; top: -18%; right: -12%;
+  width: 50%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(254,196,0,.14), transparent 70%);
+}
+#servicios::after {
+  content: ""; position: absolute; bottom: -22%; left: -14%;
+  width: 40%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(254,196,0,.09), transparent 70%);
+}
+#servicios > .container { position: relative; }
+
+/* Cifras — a single glow high on the dark field, the same warm
+   light as the hero directly above it (dark → light → dark rhythm
+   with a matching motif ties the two dark sections together). */
+.cifras-section { position: relative; overflow: hidden; }
+.cifras-section::before {
+  content: ""; position: absolute; top: -34%; right: -8%;
+  width: 46%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(254,196,0,.16), transparent 72%);
+}
+.cifras-section > .container { position: relative; }
+
+/* Por qué MOVILTRANS — an organic blob (irregular border-radius)
+   instead of another circle, for variety against Servicios' glows. */
+#nosotros { position: relative; overflow: hidden; }
+#nosotros::before {
+  content: ""; position: absolute; bottom: -20%; left: -12%;
+  width: 42%; aspect-ratio: 1; pointer-events: none;
+  border-radius: 42% 58% 68% 32% / 45% 40% 60% 55%;
+  background: radial-gradient(circle at 35% 35%, rgba(254,196,0,.15), transparent 72%);
+}
+#nosotros > .container { position: relative; }
+
+/* Cómo trabajamos — a thin arc (a ring gradient, only its edge
+   visible) curving in from the right, echoing a route line behind
+   the step-by-step process without literally repeating the
+   Cobertura map graphic. */
+.operacion-section { position: relative; overflow: hidden; }
+.operacion-section::before {
+  content: ""; position: absolute; top: 50%; right: -20%;
+  width: 58%; aspect-ratio: 1; transform: translateY(-50%);
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, transparent 61%, rgba(254,196,0,.13) 62%, transparent 64%);
+}
+.operacion-section > .container { position: relative; }
+
+/* Cobertura — already has real decorative interest via the dashed
+   route-map graphic, so just a faint wash behind the text column
+   keeps it from feeling flatter than its neighbors. */
+#cobertura { position: relative; overflow: hidden; }
+#cobertura::before {
+  content: ""; position: absolute; top: -16%; left: -10%;
+  width: 34%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(254,196,0,.10), transparent 72%);
+}
+#cobertura > .container { position: relative; }
+
+/* Footer — the page's final dark field gets the faintest touch of
+   the same light, centered like it's spilling down from Ubicación
+   above, low enough it never competes with the link columns. */
+.site-footer { position: relative; overflow: hidden; }
+.site-footer::before {
+  content: ""; position: absolute; top: -70%; left: 50%;
+  width: 64%; aspect-ratio: 1; transform: translateX(-50%);
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(254,196,0,.08), transparent 70%);
+}
+.site-footer > .container { position: relative; }
+
+/* =========================================================
    RESPONSIVE ADAPTATIONS (beyond fluid clamp/auto-fit)
    ========================================================= */
 @media (max-width: 639px) {
-  .hero__actions .btn,
-  .cta-final__actions .btn { width: 100%; }
+  .hero__actions .btn { width: 100%; }
   .split__media { aspect-ratio: 4 / 3.4; }
 }
 
