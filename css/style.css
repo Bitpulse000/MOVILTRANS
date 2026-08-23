@@ -376,6 +376,12 @@ img, svg { display: block; max-width: 100%; }
   .card .icon-wrap svg { width: 18px; height: 18px; }
   .card__title { font-size: 15px; margin-bottom: 3px; }
   .card__text { font-size: 13px; }
+  /* Deliberately NOT setting min-width:0 on the title/text here. They
+     are flex items in this row layout, so zeroing it lets flex-shrink
+     pull them below their longest word — which breaks titles
+     mid-word ("Naciona/l") in the normal case. Their min-width:auto
+     floor is what keeps each card's row intact; the grid track above
+     is sized to respect it rather than fight it. */
 }
 
 /* =========================================================
@@ -414,7 +420,23 @@ img, svg { display: block; max-width: 100%; }
    to the same top edge instead of centering (which floated the map
    above the cards). */
 #cobertura .split { align-items: flex-start; }
-.split--reverse { flex-wrap: wrap-reverse; }
+/* Once the split wraps, the map panel sits directly on top of the
+   "Cobertura" heading and the shared flex gap alone read as too
+   tight under a block that visually heavy. row-gap is the precise
+   lever: it only applies BETWEEN wrapped lines, so it adds the
+   breathing room in the stacked layout and stays inert in the
+   side-by-side desktop one — no breakpoint needed, and it can't
+   drift out of sync the way a hand-picked media query would. */
+#cobertura .split { row-gap: calc(clamp(40px, 6vw, 72px) + 20px); }
+/* There is deliberately no wrap-reverse modifier here. Cobertura and
+   Ubicación both used one, whose only real effect was to flip the
+   stacked order so the graphic sat ABOVE its heading on phones. Both
+   sections now stack in source order — heading and copy first, then
+   the map/graphic — which is also the order screen readers announce,
+   so the visual and accessibility orders finally agree. On desktop it
+   changed nothing either way: .split centres its items, so reversing
+   a single-line cross axis was a no-op, and Cobertura is an explicitly
+   placed grid at that width. */
 .split__media {
   position: relative; flex: 1 1 380px; min-width: 280px; aspect-ratio: 4 / 3;
   border-radius: var(--radius-panel); overflow: hidden;
@@ -424,7 +446,18 @@ img, svg { display: block; max-width: 100%; }
 .split__media--square {
   aspect-ratio: 1 / 1; background-color: var(--color-ink);
   background-image: url('../assets/co-dotted.svg'), radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
-  background-size: 95% auto, 20px 20px;
+  /* `contain`, not a percentage. co-dotted.svg is square (viewBox
+     0 0 1000 1000), so ANY single-axis percentage crops it as soon as
+     the panel stops being square: a width-based 95% overflows
+     vertically on a landscape panel (which already crops it on phones,
+     where the panel is 4/3.4), and a height-based one overflows
+     horizontally on a portrait panel (which the desktop panel becomes
+     at ~900px, where the card block is tall). `contain` fits by
+     whichever side is smaller, so the outline stays whole at every
+     ratio — and it is the same rule the route-map SVG above it
+     follows via preserveAspectRatio's default "meet", which keeps the
+     two graphics locked in scale with each other. */
+  background-size: contain, 20px 20px;
   background-position: center, 0 0;
   background-repeat: no-repeat, repeat;
 }
@@ -444,11 +477,94 @@ img, svg { display: block; max-width: 100%; }
 /* Fixed 2 columns (not auto-fit) so the 5th card sits alone in its
    row instead of stretching to fill it. */
 .cobertura-grid { grid-template-columns: 1fr; margin-top: 28px; }
-@media (min-width: 480px) {
-  .cobertura-grid { grid-template-columns: repeat(2, 1fr); }
+/* Two columns from 600px, not 480px. Below 640px the cards switch to
+   the compact "icon | title | text" row, which puts three flex items
+   side by side and gives the card a min-content width of ~242px. Two
+   of those plus the 10px gap need ~494px of track, but a 480px
+   viewport only offers ~432px inside the container padding — and
+   `1fr` is shorthand for minmax(auto, 1fr), whose `auto` floor
+   refuses to shrink past min-content. So the tracks stayed 242px and
+   the GRID overflowed its container instead of the cards getting
+   narrower: visibly broken from 480px right up to 557px.
+   body{overflow-x:hidden} then swallowed the resulting scrollbar,
+   which is why this never registered as document-level overflow.
+
+   600px also lines this grid up with the rest of the page, where
+   .card-grid's auto-fit minmax(260px, 1fr) reaches two columns at
+   about the same width. minmax(0, 1fr) drops the min-content floor
+   as a second line of defence, so if the copy ever grows the tracks
+   shrink and the text rewraps rather than bursting the container. */
+@media (min-width: 600px) {
+  .cobertura-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 .cobertura-media { flex: 1 1 280px; max-width: 340px; }
 .route-map { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* Desktop: map panel sized to the CARD BLOCK, not to the whole column.
+   The panel used to be a fixed 340px square capped by max-width, which
+   read as small next to the cards, and lined up with their bottom
+   edge while starting 37px below their top (the section used to carry
+   a wrap-reverse modifier, which flips the cross axis and quietly
+   turned align-items:flex-start into bottom alignment).
+
+   The cards are nested inside .cobertura-content, so a flex sibling
+   can never track them: it can only match the full column, heading
+   included. display:contents dissolves that wrapper's box so its
+   children join this grid directly, letting the card block and the
+   map share row 4 — which is what pins the panel to the cards' exact
+   top and bottom. Nothing in the HTML changes, and the wrapper is a
+   plain div with no role, so it leaves the a11y tree untouched.
+
+   The panel drops max-width and aspect-ratio here and stretches to
+   the row instead, so its height IS the cards' height and its width
+   is the column's full share (~450px at 1440px, up from 340px).
+   Below this breakpoint the split stays flex and stacks exactly as
+   before. */
+/* Below the grid breakpoint, force the split to stack. Left to itself
+   flex wraps on its own flex-basis arithmetic, which happens around
+   ~820px — leaving a dead zone (roughly 820-899px) where the columns
+   sat side by side under the OLD sizing and then jumped as the grid
+   took over. Pinning both items to a full-width basis makes one
+   breakpoint the single source of truth for "side by side". */
+@media (max-width: 899px) {
+  #cobertura .cobertura-content,
+  #cobertura .cobertura-media { flex-basis: 100%; }
+  /* The panel keeps its 340px cap while its flex line is full-width,
+     so on a wide tablet it would sit flush left with a few hundred
+     pixels of dead space beside it (.split leaves justify-content at
+     its flex-start default). Auto inline margins centre the item
+     itself — rather than justify-content on the container, which
+     would also act on the full-width copy column. Below ~380px the
+     cap stops binding, the margins resolve to 0, and nothing moves. */
+  #cobertura .cobertura-media { margin-inline: auto; }
+}
+
+@media (min-width: 900px) {
+  #cobertura .split {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: clamp(40px, 6vw, 72px);
+    /* Overrides the stacked-layout row-gap above: as grid rows these
+       are the heading lines, which must not be pushed apart. */
+    row-gap: 0;
+    align-items: start;
+  }
+  #cobertura .cobertura-content { display: contents; }
+  #cobertura .cobertura-content > .eyebrow { grid-area: 1 / 1; justify-self: start; }
+  #cobertura .cobertura-content > .section-title { grid-area: 2 / 1; }
+  #cobertura .cobertura-content > .section-lede { grid-area: 3 / 1; }
+  #cobertura .cobertura-grid { grid-area: 4 / 1; }
+  #cobertura .cobertura-media {
+    grid-area: 4 / 2;
+    align-self: stretch;
+    /* Matches .cobertura-grid's own margin-top so both items start on
+       the same line within the shared row. */
+    margin-top: 28px;
+    max-width: none;
+    aspect-ratio: auto;
+  }
+}
 
 /* =========================================================
    UBICACIÓN (mapa)
@@ -461,7 +577,14 @@ img, svg { display: block; max-width: 100%; }
    language to the section's actual subject (a pinned location). */
 .location-section {
   position: relative; overflow: hidden;
-  background: linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand) 55%, var(--color-brand-deep) 100%);
+  /* ::before is the dotted texture over the whole field, ::after
+     the ping rings bottom-right — so the stack lights the top-left
+     and lays a route arc through the middle. */
+  background-image:
+    radial-gradient(ellipse 28% 62% at 2% 6%, rgba(255,255,255,.20), transparent 70%),
+    radial-gradient(ellipse 30% 56% at 96% 96%, rgba(20,23,28,.07), transparent 70%),
+    radial-gradient(ellipse 44% 140% at 24% 50%, transparent 66%, rgba(255,255,255,.16) 67%, transparent 69%),
+    linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand) 55%, var(--color-brand-deep) 100%);
 }
 .location-section::before {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -488,15 +611,24 @@ img, svg { display: block; max-width: 100%; }
 .location-lede { margin-top: 12px; font-size: 15px; line-height: 1.6; color: rgba(20,23,28,.72); max-width: 480px; }
 
 /* Reuses .split__media's flex sizing / aspect-ratio / rounded corners
-   (map on the right on desktop — content is first in source, media
-   second, so it lands there in the row; map on top on mobile via
-   split--reverse's stacking) — just swaps its dark decorative
-   gradient for a real embedded map's framing. */
+   (content is first in source and the media second, so the map lands
+   on the right of the desktop row and below the copy once the split
+   stacks) — just swaps its dark decorative gradient for a real
+   embedded map's framing. */
 .map-embed {
   background: #FFFFFF; border: 1px solid rgba(20,23,28,.12);
   box-shadow: 0 22px 44px -26px rgba(20,23,28,.35);
 }
 .map-embed iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+/* Desktop: give the embed a larger share of the row than the text
+   column (it was an even ~50/50 split, which left the map reading
+   small for the section whose whole point is the map). Only the flex
+   ratio changes — the 4/3 aspect and every stacked breakpoint below
+   are untouched, so this cannot affect the mobile layout. */
+@media (min-width: 900px) {
+  .location-section .map-embed { flex: 1.25 1 460px; }
+}
 
 /* ---------- Tracking form fields (mobile menu's "Rastrea tu envío") ---------- */
 .tracking-widget__form { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -615,12 +747,58 @@ img, svg { display: block; max-width: 100%; }
    ::before/::after tree order.
    ========================================================= */
 
+/* ---- Desktop layer stacks ----
+   Same idea as the phone tier further down (a stack of gradient
+   layers on the section's own background-image, so the field stays
+   alive across the whole section instead of only at two corners),
+   but composed for the opposite proportions: a desktop section is
+   WIDE and short, so the layers spread along the X axis — left
+   halo, centre sweep, right depth — where the phone spreads them
+   down the Y axis.
+
+   Every layer is a full-box gradient that places its own shape via
+   `at X% Y%`, including the ring/arc shapes (an `ellipse W% H%`
+   ring reads as a long curve crossing the section). Keeping every
+   layer full-box means no background-size/background-position
+   lists are needed anywhere — which matters because those lists
+   repeat cyclically when a media query swaps in a different number
+   of image layers, and would silently misplace the phone stacks.
+   The closing linear-gradient tints each section's top and bottom
+   edge so neighbouring sections bleed into one another.
+
+   Two calibration rules matter here, and getting either wrong
+   turns the page muddy rather than composed:
+
+   1. A desktop section is wide and SHORT, so a given percentage
+      covers far more of it than the same percentage does on a
+      tall phone section. Desktop alphas therefore run roughly
+      half the mobile ones (≤.16 on paper, ≤.13 on dark) — enough
+      to read clearly, while leaving clean paper breathing between
+      the shapes instead of one continuous yellow field.
+   2. Each stack is placed to COMPLEMENT that section's two
+      pseudo-element shapes, never to overlap them: where
+      ::before/::after already hold two corners, the layers take
+      the opposite corners and the centre. Stacking a wash on top
+      of an existing blob just saturates that one corner and
+      leaves the rest flat — the exact problem this is fixing. */
+
 /* Servicios — the page's first "worked" background: a big two-tone
    blob top-right (gradient clearly visible, not a token hint) and
    an organic, ring-bordered shape bottom-left with a fine diagonal
    hairline texture inside it. 8 cards fill most of the middle, so
-   the composition lives in the padding that brackets them. */
-#servicios { position: relative; overflow: hidden; }
+   the pseudo-element shapes live in the padding that brackets
+   them, while the layer stack carries the area behind/around. */
+#servicios {
+  position: relative; overflow: hidden;
+  /* ::before holds top-right, ::after bottom-left — so the stack
+     takes top-left, bottom-right and a centre arc. */
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse 22% 44% at 1% 10%, rgba(254,196,0,.15), transparent 68%),
+    radial-gradient(ellipse 26% 48% at 99% 92%, rgba(224,168,0,.12), transparent 70%),
+    radial-gradient(ellipse 46% 130% at 26% 50%, transparent 63%, rgba(254,196,0,.15) 64%, transparent 66%),
+    linear-gradient(180deg, rgba(254,196,0,.05) 0%, transparent 22%, rgba(20,23,28,.022) 62%, rgba(254,196,0,.055) 100%);
+}
 #servicios::before {
   content: ""; position: absolute; top: -24%; right: -16%;
   width: 66%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
@@ -643,7 +821,16 @@ img, svg { display: block; max-width: 100%; }
    field (the same light language as the hero's .glow-spot directly
    above), plus a large thin ring bottom-left for geometric
    structure — a nod to the dashed .route-map further down. */
-.cifras-section { position: relative; overflow: hidden; }
+.cifras-section {
+  position: relative; overflow: hidden;
+  /* ::before holds top-right, ::after bottom-left. */
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(ellipse 24% 56% at 2% 12%, rgba(254,196,0,.10), transparent 68%),
+    radial-gradient(ellipse 28% 52% at 98% 94%, rgba(224,168,0,.09), transparent 70%),
+    radial-gradient(ellipse 40% 150% at 66% 50%, transparent 66%, rgba(254,196,0,.11) 67%, transparent 69%),
+    linear-gradient(180deg, rgba(254,196,0,.05) 0%, transparent 24%, transparent 74%, rgba(254,196,0,.04) 100%);
+}
 .cifras-section::before {
   content: ""; position: absolute; top: -38%; right: -10%;
   width: 52%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
@@ -662,13 +849,33 @@ img, svg { display: block; max-width: 100%; }
    border-radius, for variety against Servicios' circles) bottom-
    left, plus a dot-grid-textured glow top-right for a second,
    clearly different layer. */
-#nosotros { position: relative; overflow: hidden; }
+#nosotros {
+  position: relative; overflow: hidden;
+  /* Shortest paper section on desktop (one card row), so the
+     shapes have little vertical room to separate. ::before holds
+     bottom-left and ::after top-right; a top-LEFT wash here would
+     merge with ::before into one heavy left band, so the stack
+     lights the title band across the centre instead and keeps the
+     bottom-right corner light. */
+  background-color: var(--color-paper);
+  background-image:
+    radial-gradient(ellipse 30% 40% at 42% 0%, rgba(254,196,0,.11), transparent 70%),
+    radial-gradient(ellipse 24% 44% at 99% 96%, rgba(224,168,0,.10), transparent 70%),
+    radial-gradient(ellipse 50% 135% at 74% 50%, transparent 64%, rgba(254,196,0,.13) 65%, transparent 67%),
+    linear-gradient(180deg, rgba(254,196,0,.045) 0%, transparent 24%, rgba(20,23,28,.02) 62%, rgba(254,196,0,.05) 100%);
+}
+/* Lighter here than its counterparts in the other sections on
+   purpose: this is the shortest paper section on desktop (a single
+   card row), so a blob this wide anchored to the bottom-left rises
+   across most of the left edge and reads as a heavy yellow band
+   rather than a shape. The phone tier restores the fuller strength,
+   where the section is tall enough for it to read as a blob. */
 #nosotros::before {
   content: ""; position: absolute; bottom: -22%; left: -14%;
-  width: 46%; aspect-ratio: 1; pointer-events: none;
+  width: 40%; aspect-ratio: 1; pointer-events: none;
   border-radius: 42% 58% 68% 32% / 45% 40% 60% 55%;
-  background: radial-gradient(circle at 35% 35%, rgba(254,196,0,.34), transparent 72%);
-  border: 1.5px solid rgba(254,196,0,.28);
+  background: radial-gradient(circle at 35% 35%, rgba(254,196,0,.19), transparent 72%);
+  border: 1.5px solid rgba(254,196,0,.16);
 }
 #nosotros::after {
   content: ""; position: absolute; top: -20%; right: -12%;
@@ -684,7 +891,18 @@ img, svg { display: block; max-width: 100%; }
    visible) curving in from the right, echoing a route line behind
    the step-by-step process, plus a small filled blob + short
    diagonal accents top-left for balance. */
-.operacion-section { position: relative; overflow: hidden; }
+.operacion-section {
+  position: relative; overflow: hidden;
+  /* ::before holds the right-centre arc, ::after top-left — so the
+     stack takes bottom-left, the right edge low, and a soft
+     centre band. */
+  background-color: var(--color-paper-2);
+  background-image:
+    radial-gradient(ellipse 24% 48% at 2% 92%, rgba(254,196,0,.14), transparent 70%),
+    radial-gradient(ellipse 26% 44% at 99% 16%, rgba(224,168,0,.11), transparent 70%),
+    radial-gradient(ellipse 40% 40% at 52% 104%, rgba(254,196,0,.12), transparent 70%),
+    linear-gradient(180deg, rgba(254,196,0,.05) 0%, transparent 24%, rgba(20,23,28,.022) 62%, rgba(254,196,0,.055) 100%);
+}
 .operacion-section::before {
   content: ""; position: absolute; top: 50%; right: -22%;
   width: 60%; aspect-ratio: 1; transform: translateY(-50%);
@@ -700,22 +918,74 @@ img, svg { display: block; max-width: 100%; }
 }
 .operacion-section > .container { position: relative; z-index: 1; }
 
-/* Cobertura — already has real decorative interest via the dashed
-   route-map graphic, so the ambient layer stays in the padding
-   around the text column: a bolder wash top-left echoed by a
-   dashed-ring glow bottom-right in the brand-deep tone for a
-   second color note. */
-#cobertura { position: relative; overflow: hidden; }
-#cobertura::before {
-  content: ""; position: absolute; top: -20%; left: -12%;
-  width: 40%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(254,196,0,.26), transparent 70%);
+/* Cobertura — the section's subject (reach across a territory) gets
+   an explicit motif rather than the generic corner blobs used
+   before: concentric "coverage radar" rings radiating from the left
+   edge, a dotted territory patch bottom-right, and a dashed route
+   arc sweeping between them — the same dashed language as the
+   .route-map SVG in the panel, scaled up to section size.
+
+   The washes live on the section's own background-image (four
+   stacked gradient layers) instead of on the two pseudo-elements,
+   which frees ::before/::after for the crisp ring/texture shapes.
+   Layers positioned with `at X% Y%` are placed INSIDE the box, so
+   unlike negatively-offset pseudo-elements they can never be pushed
+   out of view no matter how tall the section grows. */
+#cobertura {
+  position: relative; overflow: hidden;
+  background-color: var(--color-paper);
+  background-image:
+    /* Route nodes — a scatter of waypoints reading as a network
+       across the section. Placed in the bands that stay open on
+       desktop (above the title, below the cards, and the margins
+       outside the container) so they are never buried behind the
+       opaque cards or the map panel. */
+    radial-gradient(circle 5px at 7% 13%, rgba(224,168,0,.50), transparent 100%),
+    radial-gradient(circle 7px at 26% 7%, rgba(254,196,0,.55), transparent 100%),
+    radial-gradient(circle 4px at 45% 14%, rgba(224,168,0,.42), transparent 100%),
+    radial-gradient(circle 6px at 67% 6%, rgba(254,196,0,.48), transparent 100%),
+    radial-gradient(circle 5px at 95% 16%, rgba(224,168,0,.45), transparent 100%),
+    radial-gradient(circle 6px at 12% 94%, rgba(254,196,0,.45), transparent 100%),
+    radial-gradient(circle 4px at 38% 97%, rgba(224,168,0,.40), transparent 100%),
+    radial-gradient(circle 6px at 72% 93%, rgba(254,196,0,.42), transparent 100%),
+    radial-gradient(circle 5px at 94% 88%, rgba(224,168,0,.42), transparent 100%),
+    /* Connecting arcs — wide, flat ring gradients whose visible
+       edge reads as a route curving across the full width. */
+    radial-gradient(ellipse 58% 150% at 30% 46%, transparent 65%, rgba(254,196,0,.17) 66%, transparent 68%),
+    radial-gradient(ellipse 46% 130% at 88% 56%, transparent 67%, rgba(224,168,0,.15) 68%, transparent 70%),
+    /* Washes spread along the X axis — ::before holds the left
+       centre (radar) and ::after the bottom-right (territory),
+       so these take the top band and the bottom-left. */
+    radial-gradient(ellipse 30% 46% at 50% 1%, rgba(254,196,0,.15), transparent 70%),
+    radial-gradient(ellipse 26% 46% at 99% 8%, rgba(224,168,0,.13), transparent 70%),
+    radial-gradient(ellipse 34% 42% at 6% 104%, rgba(254,196,0,.14), transparent 70%),
+    linear-gradient(168deg, rgba(254,196,0,.06) 0%, transparent 30%, rgba(20,23,28,.03) 64%, rgba(254,196,0,.07) 100%);
 }
+/* Coverage radar: three concentric rings + a soft core, anchored to
+   the left edge and vertically centred so it reads across the whole
+   section height rather than sitting in one corner. */
+#cobertura::before {
+  content: ""; position: absolute; top: 50%; left: -20%;
+  width: 60%; aspect-ratio: 1; transform: translateY(-50%);
+  border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(254,196,0,.17), transparent 54%),
+    radial-gradient(circle, transparent 37%, rgba(254,196,0,.34) 38%, transparent 40%),
+    radial-gradient(circle, transparent 55%, rgba(254,196,0,.26) 56%, transparent 58%),
+    radial-gradient(circle, transparent 73%, rgba(224,168,0,.20) 74%, transparent 76%);
+}
+/* Territory patch: a dot grid (echoing co-dotted.svg in the panel)
+   faded out at its edges by a mask, ringed by a dashed route circle. */
 #cobertura::after {
-  content: ""; position: absolute; bottom: -18%; right: -10%;
-  width: 30%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(224,168,0,.16), transparent 68%);
-  border: 1.5px dashed rgba(224,168,0,.3);
+  content: ""; position: absolute; bottom: -18%; right: -12%;
+  width: 46%; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(224,168,0,.20), transparent 64%),
+    radial-gradient(rgba(20,23,28,.15) 1.5px, transparent 1.5px);
+  background-size: 100% 100%, 20px 20px;
+  border: 1.5px dashed rgba(224,168,0,.34);
+  -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 82%);
+  mask-image: radial-gradient(circle, #000 58%, transparent 82%);
 }
 #cobertura > .container { position: relative; z-index: 1; }
 
@@ -727,6 +997,15 @@ img, svg { display: block; max-width: 100%; }
 .site-footer {
   position: relative; overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(254,196,0,.35);
+  /* ::before is the big glow spilling in from Ubicación above,
+     ::after the ring bottom-right — so the stack takes the two
+     left corners and threads an arc through the right half. */
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(ellipse 26% 64% at 1% 10%, rgba(254,196,0,.11), transparent 68%),
+    radial-gradient(ellipse 30% 54% at 4% 98%, rgba(224,168,0,.09), transparent 70%),
+    radial-gradient(ellipse 46% 145% at 76% 48%, transparent 67%, rgba(254,196,0,.11) 68%, transparent 70%),
+    linear-gradient(180deg, rgba(254,196,0,.07) 0%, transparent 26%, transparent 78%, rgba(254,196,0,.04) 100%);
 }
 .site-footer::before {
   content: ""; position: absolute; top: -62%; left: 50%;
@@ -755,4 +1034,233 @@ img, svg { display: block; max-width: 100%; }
 
 @media (min-width: 900px) {
   .card-grid--why { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* =========================================================
+   AMBIENT BACKGROUNDS — TABLET / MOBILE
+   Every shape above is positioned with top/bottom as a % of
+   its OWN section's height. That works on desktop, where
+   section height tracks viewport height closely — but on
+   phones/small tablets the same sections stack much taller
+   (cards go to one column, footer columns stack, 8 service
+   cards become a long list), so those percentages resolve
+   against a much bigger number and push the shapes hundreds
+   of pixels above/below the visible box. They don't get
+   hidden — they get shoved off-screen by the math. Below
+   900px every affected offset switches to vw units instead,
+   which track the (predictable, shrinking) viewport width
+   rather than the section's unpredictable content height, so
+   each shape stays anchored to the corner it's meant to
+   occupy regardless of how tall the content stack gets.
+   Below 640px a further pass reshapes the bottom/top shape of
+   the tallest sections (Servicios, Nosotros, Cobertura,
+   Footer) into an elongated vertical form that makes real use
+   of the narrow, tall phone canvas instead of just shrinking
+   a circle. Everything still sits behind each section's
+   z-index:1 .container, and still clips at overflow:hidden
+   section edges, so nothing ever covers text/cards/buttons
+   and the controlled screen-edge bleed stays controlled. */
+
+@media (max-width: 900px) {
+  #servicios::before { top: -12vw; right: -18vw; width: 56vw; }
+  #servicios::after { bottom: -14vw; left: -16vw; width: 44vw; }
+
+  .cifras-section::before { top: -16vw; right: -12vw; width: 48vw; }
+  .cifras-section::after { bottom: -18vw; left: -12vw; width: 36vw; }
+
+  /* Restores the fuller strength the desktop rule tones down —
+     from here the section is tall enough that this reads as a
+     blob rather than a band up the left edge. */
+  #nosotros::before {
+    bottom: -14vw; left: -12vw; width: 42vw;
+    background: radial-gradient(circle at 35% 35%, rgba(254,196,0,.34), transparent 72%);
+    border-color: rgba(254,196,0,.28);
+  }
+  #nosotros::after { top: -14vw; right: -10vw; width: 34vw; }
+
+  .operacion-section::after { top: -14vw; left: -9vw; width: 30vw; }
+
+  #cobertura::before { top: -14vw; left: -10vw; width: 34vw; }
+  #cobertura::after { bottom: -12vw; right: -9vw; width: 26vw; }
+
+  .location-section::after { bottom: -16vw; right: -10vw; width: 38vw; }
+
+  .site-footer::before { top: -22vw; width: 84vw; }
+  .site-footer::after { bottom: -14vw; right: -10vw; width: 32vw; }
+
+  /* ---- Distributed background layers (tablet AND phone) ----
+     Two pseudo-elements can only ever make two shapes, and from
+     here down the sections run tall enough (cards drop to 1-2
+     columns, footer columns stack) that two corner shapes leave
+     most of the scroll flat. So each section paints a STACK of
+     gradient layers on its own background-image, each layer set
+     at a different height with `at X% Y%` — roughly top / upper-
+     middle / middle / lower-middle / bottom — keeping the field
+     alive the whole way down.
+
+     Because those positions are percentages resolved inside the
+     box, they scale with the section instead of being pushed out
+     of it: the same stack distributes correctly on a 700px-tall
+     tablet section and a 2000px-tall phone one, which is why this
+     lives at the 900px tier rather than being duplicated per
+     breakpoint. The closing linear-gradient tints each section's
+     top and bottom edges so neighbours bleed into one another
+     instead of meeting at a hard seam.
+
+     Alphas stay moderate (≤.34 on paper, ≤.18 on the dark ink
+     sections) so body copy keeps its contrast, and all real
+     content still paints above via each section's z-index:1
+     container. */
+  #servicios {
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(ellipse 92% 13% at 92% 2%, rgba(254,196,0,.36), transparent 68%),
+      radial-gradient(ellipse 78% 10% at 2% 24%, rgba(254,196,0,.24), transparent 70%),
+      radial-gradient(ellipse 88% 11% at 98% 46%, rgba(224,168,0,.22), transparent 70%),
+      radial-gradient(ellipse 80% 10% at 0% 68%, rgba(254,196,0,.24), transparent 70%),
+      radial-gradient(ellipse 95% 12% at 70% 92%, rgba(224,168,0,.20), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.10) 0%, transparent 26%, rgba(20,23,28,.035) 60%, rgba(254,196,0,.10) 100%);
+  }
+
+  .cifras-section {
+    background-color: var(--color-ink);
+    background-image:
+      radial-gradient(ellipse 85% 30% at 95% 4%, rgba(254,196,0,.20), transparent 68%),
+      radial-gradient(ellipse 70% 24% at 0% 52%, rgba(254,196,0,.13), transparent 70%),
+      radial-gradient(ellipse 90% 26% at 80% 98%, rgba(224,168,0,.14), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.07) 0%, transparent 30%, transparent 70%, rgba(254,196,0,.06) 100%);
+  }
+
+  #nosotros {
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(ellipse 85% 14% at 96% 3%, rgba(224,168,0,.26), transparent 70%),
+      radial-gradient(ellipse 75% 12% at 0% 34%, rgba(254,196,0,.26), transparent 70%),
+      radial-gradient(ellipse 90% 13% at 95% 64%, rgba(254,196,0,.22), transparent 70%),
+      radial-gradient(ellipse 80% 12% at 6% 96%, rgba(224,168,0,.22), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.09) 0%, transparent 28%, rgba(20,23,28,.035) 62%, rgba(254,196,0,.10) 100%);
+  }
+
+  .operacion-section {
+    background-color: var(--color-paper-2);
+    background-image:
+      radial-gradient(ellipse 80% 12% at 4% 4%, rgba(254,196,0,.24), transparent 70%),
+      radial-gradient(ellipse 90% 14% at 98% 38%, rgba(254,196,0,.26), transparent 70%),
+      radial-gradient(ellipse 75% 12% at 0% 72%, rgba(224,168,0,.20), transparent 70%),
+      radial-gradient(ellipse 95% 12% at 60% 99%, rgba(254,196,0,.18), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.09) 0%, transparent 30%, rgba(20,23,28,.03) 64%, rgba(254,196,0,.09) 100%);
+  }
+
+  /* Ubicación — the dotted texture spreads across the full field
+     and two washes give the flat yellow depth top and bottom,
+     instead of a single ring in one corner. */
+  .location-section {
+    background-image:
+      radial-gradient(ellipse 90% 20% at 8% 2%, rgba(255,255,255,.30), transparent 70%),
+      radial-gradient(ellipse 85% 22% at 100% 60%, rgba(20,23,28,.10), transparent 70%),
+      radial-gradient(ellipse 95% 18% at 20% 100%, rgba(224,168,0,.55), transparent 72%),
+      linear-gradient(135deg, var(--color-brand) 0%, var(--color-brand) 55%, var(--color-brand-deep) 100%);
+  }
+  .location-section::before {
+    -webkit-mask-image: radial-gradient(ellipse 95% 85% at 50% 45%, #000 0%, transparent 82%);
+    mask-image: radial-gradient(ellipse 95% 85% at 50% 45%, #000 0%, transparent 82%);
+  }
+
+  .site-footer {
+    background-color: var(--color-ink);
+    background-image:
+      radial-gradient(ellipse 95% 18% at 50% 1%, rgba(254,196,0,.20), transparent 68%),
+      radial-gradient(ellipse 80% 14% at 0% 30%, rgba(254,196,0,.12), transparent 70%),
+      radial-gradient(ellipse 85% 14% at 100% 58%, rgba(224,168,0,.13), transparent 70%),
+      radial-gradient(ellipse 90% 16% at 30% 92%, rgba(254,196,0,.11), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.09) 0%, transparent 26%, transparent 74%, rgba(254,196,0,.05) 100%);
+  }
+}
+
+/* ---------------------------------------------------------
+   PHONE (≤640px) — phone-only adjustments on top of the layer
+   stacks above. Those stacks already distribute correctly here
+   (their positions are percentages), so this tier only reshapes
+   the two pseudo-elements per section: on a narrow, tall canvas
+   an elongated vertical blob hugging a screen edge reads as
+   designed, where a shrunken circle just reads as a smudge.
+   --------------------------------------------------------- */
+@media (max-width: 640px) {
+  /* --- Servicios: 8 stacked cards, the tallest paper section --- */
+  #servicios::before { top: -10vw; right: -22vw; width: 62vw; }
+  #servicios::after {
+    width: 34vw; height: 86vw; aspect-ratio: auto;
+    bottom: 22%; left: -14vw;
+    border-radius: 40% 60% 55% 45% / 20% 25% 75% 80%;
+  }
+
+  /* --- Por qué MOVILTRANS --- */
+  #nosotros::before {
+    width: 32vw; height: 78vw; aspect-ratio: auto;
+    bottom: 14%; left: -12vw;
+    border-radius: 45% 55% 60% 40% / 25% 30% 70% 75%;
+  }
+  #nosotros::after { top: -10vw; right: -14vw; width: 40vw; }
+
+  /* --- Cómo trabajamos: route arc pulled to the right edge and
+     re-centred on the steps list so the curve sweeps past the
+     01-04 rows instead of sitting off to one side. --- */
+  .operacion-section::before { top: 62%; right: -34vw; width: 78vw; }
+
+  /* --- Cobertura: the radar motif kept, restacked vertically.
+     The opaque map panel is first in the flow on mobile, so the
+     radar drops below it to sweep behind the title/lede instead
+     of being hidden by it, and the territory patch becomes a
+     tall dashed oval running down beside the card column.
+
+     This section also gets its own (stronger) wash stack rather
+     than the shared one: its stacked cards span all but ~20px of
+     the viewport, so the middle band has almost no open canvas —
+     decoration there reads only through the thin side margins
+     and the 10px card gaps, which needs more contrast to carry. */
+  #cobertura {
+    background-color: var(--color-paper);
+    background-image:
+      radial-gradient(ellipse 95% 13% at 88% 2%, rgba(254,196,0,.38), transparent 70%),
+      radial-gradient(ellipse 70% 14% at -5% 32%, rgba(254,196,0,.40), transparent 68%),
+      radial-gradient(ellipse 70% 14% at 105% 56%, rgba(224,168,0,.34), transparent 68%),
+      radial-gradient(ellipse 75% 13% at -5% 80%, rgba(254,196,0,.32), transparent 68%),
+      radial-gradient(ellipse 95% 14% at 60% 100%, rgba(224,168,0,.30), transparent 70%),
+      linear-gradient(180deg, rgba(254,196,0,.14) 0%, transparent 26%, rgba(20,23,28,.05) 60%, rgba(254,196,0,.16) 100%);
+  }
+  #cobertura::before {
+    top: 26%; left: -34vw; width: 88vw; transform: none;
+    background:
+      radial-gradient(circle, rgba(254,196,0,.22), transparent 54%),
+      radial-gradient(circle, transparent 37%, rgba(254,196,0,.46) 38%, transparent 40%),
+      radial-gradient(circle, transparent 55%, rgba(254,196,0,.38) 56%, transparent 58%),
+      radial-gradient(circle, transparent 73%, rgba(224,168,0,.30) 74%, transparent 76%);
+  }
+  #cobertura::after {
+    width: 46vw; height: 72vw; aspect-ratio: auto;
+    bottom: -6vw; right: -20vw;
+  }
+
+  /* --- Ubicación: location-ping rings enlarged so they still
+     register against the full-width yellow field. --- */
+  .location-section::after { bottom: -14vw; right: -14vw; width: 52vw; }
+
+  /* --- Footer: the closing field, tallest of all on mobile
+     (brand block + 2 link columns + contact + legal). The top
+     glow spreads near edge-to-edge with a soft vertical beam
+     layered in; the bottom-right ring stretches into a tall
+     sliver running down the last column. --- */
+  .site-footer::before {
+    top: -16vw; width: 96vw;
+    background:
+      radial-gradient(circle at 40% 55%, rgba(254,196,0,.20), transparent 62%),
+      radial-gradient(circle at 65% 40%, rgba(224,168,0,.13), transparent 66%),
+      linear-gradient(180deg, rgba(254,196,0,.10), transparent 65%),
+      radial-gradient(rgba(255,255,255,.05) 1.5px, transparent 1.5px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px;
+  }
+  .site-footer::after {
+    width: 30vw; height: 66vw; aspect-ratio: auto;
+    bottom: 8%; right: -10vw;
+  }
 }
