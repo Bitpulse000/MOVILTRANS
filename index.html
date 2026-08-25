@@ -141,11 +141,10 @@
             <div class="speed-line speed-line--5"></div>
             <div class="glow-spot"></div>
           </div>
-          <!-- No <source> here either — main.js only attaches
-               assets/video_entrada.mp4 (12MB!) on the same wide/fast-
-               connection devices as the hero background video. On phones
-               (and reduced-motion/slow connections) this panel just shows
-               its poster, assets/cargando_camion.webp, as a static image. -->
+          <!-- No <source> here — main.js attaches assets/video_entrada.mp4
+               (12MB!) on load, unconditionally (including on phones and
+               slow connections). Until main.js runs, this panel shows its
+               poster, assets/cargando_camion.webp, as a static image. -->
           <video class="hero__video" muted loop playsinline preload="none" poster="assets/cargando_camion.webp" data-src="assets/video_entrada.mp4"></video>
         </div>
       </div>

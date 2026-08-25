@@ -115,12 +115,17 @@
   /* -----------------------------------------------------
      Hero videos — neither .hero__bg-video (assets/fondo_bodega.mp4,
      3.7MB) nor .hero__video (assets/video_entrada.mp4, 12MB!) ships a
-     <source> in the markup. Both stay as their `poster`/CSS-background
-     still image on: narrow/mobile viewports, reduced-motion, and
-     metered or slow connections. Only when none of those apply do we
-     attach a <source>, load it, and play it — so a phone never pays
-     for 15+MB of autoplaying video it can't even see the point of on a
-     small screen.
+     <source> in the markup, so main.js has to attach one before either
+     can play.
+
+     .hero__bg-video stays gated: it keeps its `poster`/CSS-background
+     still image on narrow/mobile viewports, reduced-motion, and
+     metered or slow connections, and only gets a <source> when none of
+     those apply.
+
+     .hero__video (video_entrada.mp4) is exempt from all of that by
+     request — it always gets a <source> and always plays, including on
+     narrow/mobile viewports and slow/metered connections.
      ----------------------------------------------------- */
   function canAffordHeroVideo() {
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -161,9 +166,11 @@
   }
 
   function initHeroVideos() {
-    if (!canAffordHeroVideo()) return; // keep each video's poster/background image
-    attachHeroVideoSource(document.querySelector('.hero__bg-video'), true);
+    // .hero__video (video_entrada.mp4) always plays, no exceptions.
     attachHeroVideoSource(document.querySelector('.hero__video'), false);
+
+    if (!canAffordHeroVideo()) return; // keep .hero__bg-video's CSS background image
+    attachHeroVideoSource(document.querySelector('.hero__bg-video'), true);
   }
 
   /* -----------------------------------------------------
