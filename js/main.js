@@ -17,7 +17,7 @@
 
   // WhatsApp number in international format, digits only, no '+'.
   // Example: '573001234567'. Leave empty until confirmed.
-  var WHATSAPP_NUMBER = '573104493541';
+  var WHATSAPP_NUMBER = '573125270076';
   var WHATSAPP_MESSAGE = 'Hola, quiero solicitar una cotización de transporte de carga con MOVILTRANS LOGISTIC.';
 
   // Social links (Facebook, Instagram, LinkedIn, TikTok) are added
