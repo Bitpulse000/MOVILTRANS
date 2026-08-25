@@ -113,17 +113,57 @@
   }
 
   /* -----------------------------------------------------
-     Hero video — don't autoplay motion for viewers who have
-     asked their system for reduced motion; show a still frame.
+     Hero videos — neither .hero__bg-video (assets/fondo_bodega.mp4,
+     3.7MB) nor .hero__video (assets/video_entrada.mp4, 12MB!) ships a
+     <source> in the markup. Both stay as their `poster`/CSS-background
+     still image on: narrow/mobile viewports, reduced-motion, and
+     metered or slow connections. Only when none of those apply do we
+     attach a <source>, load it, and play it — so a phone never pays
+     for 15+MB of autoplaying video it can't even see the point of on a
+     small screen.
      ----------------------------------------------------- */
-  function initHeroVideo() {
-    var video = document.querySelector('.hero__video');
-    if (!video) return;
+  function canAffordHeroVideo() {
     var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      video.removeAttribute('autoplay');
-      video.pause();
+    var isNarrow = window.innerWidth < 761;
+    var conn = navigator.connection || navigator.webkitConnection || navigator.mozConnection;
+    var isConstrained = conn && (conn.saveData || /^(slow-2g|2g|3g)$/.test(conn.effectiveType || ''));
+    return !prefersReduced && !isNarrow && !isConstrained;
+  }
+
+  // pauseOffscreen: stop decoding while the video has scrolled out of
+  // view (used for the full-bleed background video; the small hero
+  // visual panel is short enough that it's basically always in view
+  // together with the rest of the hero, so it just plays continuously).
+  function attachHeroVideoSource(video, pauseOffscreen) {
+    if (!video) return;
+    var src = video.getAttribute('data-src');
+    if (!src) return;
+    var source = document.createElement('source');
+    source.src = src;
+    source.type = 'video/mp4';
+    video.appendChild(source);
+    video.load();
+
+    if (pauseOffscreen && 'IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            video.play().catch(function () {});
+          } else {
+            video.pause();
+          }
+        });
+      }, { threshold: 0.1 });
+      io.observe(video);
+    } else {
+      video.play().catch(function () {});
     }
+  }
+
+  function initHeroVideos() {
+    if (!canAffordHeroVideo()) return; // keep each video's poster/background image
+    attachHeroVideoSource(document.querySelector('.hero__bg-video'), true);
+    attachHeroVideoSource(document.querySelector('.hero__video'), false);
   }
 
   /* -----------------------------------------------------
@@ -168,7 +208,7 @@
     wireTrackingPlaceholder();
     initMobileMenu();
     initHeaderScrollState();
-    initHeroVideo();
+    initHeroVideos();
     initReveal();
   });
 })();

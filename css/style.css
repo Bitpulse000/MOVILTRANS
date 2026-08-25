@@ -280,8 +280,12 @@ img, svg { display: block; max-width: 100%; }
    HERO
    ========================================================= */
 .hero {
+  position: relative; overflow: hidden;
   color: var(--color-paper);
   background-color: var(--color-ink);
+  /* This is also the fallback: it's what shows whenever .hero__bg-video
+     stays empty (mobile, reduced motion, slow connections — see main.js),
+     and it's what the video's own poster paints before the .mp4 has data. */
   background-image:
     linear-gradient(100deg, rgba(20,23,28,.95) 0%, rgba(20,23,28,.88) 40%, rgba(20,23,28,.62) 100%),
     url('../assets/fondo_bodega.webp');
@@ -289,11 +293,31 @@ img, svg { display: block; max-width: 100%; }
   background-position: center;
   background-repeat: no-repeat;
 }
+/* Sits behind everything, filling the section exactly like the CSS
+   background it replaces once it has data to paint. */
+.hero__bg-video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+}
+/* Same dark gradient as .hero's own background-image, redrawn as a layer
+   ABOVE the video so hero copy stays legible once it's playing. */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1;
+  background-image: linear-gradient(100deg, rgba(20,23,28,.95) 0%, rgba(20,23,28,.88) 40%, rgba(20,23,28,.62) 100%);
+}
 .hero__grid {
+  position: relative; z-index: 2;
   display: flex; flex-wrap: wrap; align-items: center;
   gap: clamp(36px, 6vw, 64px);
   padding-top: clamp(48px, 7vw, 80px);
   padding-bottom: clamp(56px, 9vw, 104px);
+}
+/* Mobile and reduced-motion both skip the video entirely (main.js never
+   attaches a source), but this is a no-op safety net if that ever changes:
+   the static image is the right call on narrow/motion-sensitive viewers
+   either way, so never show the <video> element there. */
+@media (max-width: 760px), (prefers-reduced-motion: reduce) {
+  .hero__bg-video { display: none; }
 }
 .hero__content { flex: 1 1 420px; min-width: 280px; }
 .hero__title {
@@ -461,6 +485,14 @@ img, svg { display: block; max-width: 100%; }
   background-position: center, 0 0;
   background-repeat: no-repeat, repeat;
 }
+/* cargando_camion.webp is a tall 880x1187 (~3:4) photo — the default
+   .split__media is a landscape 4:3, which would crop away most of the
+   subject. Doubled-up selector (.split__media.split__media--portrait)
+   beats the max-width:639px override below it in the cascade on
+   specificity alone, so this ratio holds on mobile too. Capped
+   max-width (echoing .hero__visual's own 400px cap on its 9:16 panel)
+   keeps a 3:4 panel from growing implausibly tall on a wide viewport. */
+.split__media.split__media--portrait { aspect-ratio: 3 / 4; flex: 0 1 380px; max-width: 420px; margin-inline: auto; }
 .split__content { flex: 1 1 380px; min-width: 280px; }
 
 .steps { margin-top: clamp(28px, 4vw, 40px); }
@@ -851,12 +883,10 @@ img, svg { display: block; max-width: 100%; }
    clearly different layer. */
 #nosotros {
   position: relative; overflow: hidden;
-  /* Shortest paper section on desktop (one card row), so the
-     shapes have little vertical room to separate. ::before holds
-     bottom-left and ::after top-right; a top-LEFT wash here would
-     merge with ::before into one heavy left band, so the stack
-     lights the title band across the centre instead and keeps the
-     bottom-right corner light. */
+  /* ::before holds bottom-left and ::after top-right; a top-LEFT
+     wash here would merge with ::before into one heavy left band,
+     so the stack lights the title band across the centre instead
+     and keeps the bottom-right corner light. */
   background-color: var(--color-paper);
   background-image:
     radial-gradient(ellipse 30% 40% at 42% 0%, rgba(254,196,0,.11), transparent 70%),
@@ -865,11 +895,11 @@ img, svg { display: block; max-width: 100%; }
     linear-gradient(180deg, rgba(254,196,0,.045) 0%, transparent 24%, rgba(20,23,28,.02) 62%, rgba(254,196,0,.05) 100%);
 }
 /* Lighter here than its counterparts in the other sections on
-   purpose: this is the shortest paper section on desktop (a single
-   card row), so a blob this wide anchored to the bottom-left rises
-   across most of the left edge and reads as a heavy yellow band
-   rather than a shape. The phone tier restores the fuller strength,
-   where the section is tall enough for it to read as a blob. */
+   purpose: anchored bottom-left against the tall image panel beside
+   it, a blob at full strength would rise across most of the left
+   edge and read as a heavy yellow band rather than a shape. The
+   phone tier restores the fuller strength, once the panel has
+   stacked above this content instead of sitting beside it. */
 #nosotros::before {
   content: ""; position: absolute; bottom: -22%; left: -14%;
   width: 40%; aspect-ratio: 1; pointer-events: none;
@@ -1030,10 +1060,6 @@ img, svg { display: block; max-width: 100%; }
 @media (max-width: 639px) {
   .hero__actions .btn { width: 100%; }
   .split__media { aspect-ratio: 4 / 3.4; }
-}
-
-@media (min-width: 900px) {
-  .card-grid--why { grid-template-columns: repeat(4, 1fr); }
 }
 
 /* =========================================================

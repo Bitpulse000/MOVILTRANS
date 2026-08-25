@@ -109,6 +109,12 @@
 
     <!-- ===================== HERO ===================== -->
     <section class="hero" aria-labelledby="hero-title">
+      <!-- Background video: no <source> in the markup on purpose — main.js
+           only attaches assets/fondo_bodega.mp4 (3.7MB) on connections that
+           can actually afford it. Everyone else keeps the .hero CSS
+           background (fondo_bodega.webp, 156KB), so nobody pays for a video
+           they won't get. -->
+      <video class="hero__bg-video" muted loop playsinline preload="none" poster="assets/fondo_bodega.webp" data-src="assets/fondo_bodega.mp4" aria-hidden="true"></video>
       <div class="container hero__grid">
         <div class="hero__content">
           <p class="eyebrow eyebrow--on-dark reveal">Transporte de carga · Cobertura nacional</p>
@@ -135,9 +141,12 @@
             <div class="speed-line speed-line--5"></div>
             <div class="glow-spot"></div>
           </div>
-          <video class="hero__video" autoplay muted loop playsinline preload="auto">
-            <source src="assets/video_entrada.mp4" type="video/mp4">
-          </video>
+          <!-- No <source> here either — main.js only attaches
+               assets/video_entrada.mp4 (12MB!) on the same wide/fast-
+               connection devices as the hero background video. On phones
+               (and reduced-motion/slow connections) this panel just shows
+               its poster, assets/cargando_camion.webp, as a static image. -->
+          <video class="hero__video" muted loop playsinline preload="none" poster="assets/cargando_camion.webp" data-src="assets/video_entrada.mp4"></video>
         </div>
       </div>
     </section>
@@ -246,38 +255,44 @@
 
     <!-- ===================== POR QUÉ MOVILTRANS ===================== -->
     <section class="section section--paper" id="nosotros" aria-labelledby="porque-title">
-      <div class="container">
-        <p class="eyebrow reveal">Por qué MOVILTRANS</p>
-        <h2 id="porque-title" class="section-title reveal">Confianza que se transporta.</h2>
+      <div class="container split">
+        <div class="split__media split__media--portrait reveal">
+          <img class="split__img" src="assets/cargando_camion.webp" alt="Carga de mercancía en un camión de transporte" width="880" height="1187" loading="lazy" decoding="async">
+        </div>
 
-        <div class="card-grid card-grid--why">
-          <div class="card reveal">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6v5c0 5-3.5 9-8 11-4.5-2-8-6-8-11V6l8-4Z"/><path d="M9 12l2 2 4-4.5"/></svg>
+        <div class="split__content">
+          <p class="eyebrow reveal">Por qué MOVILTRANS</p>
+          <h2 id="porque-title" class="section-title section-title--tight reveal">Confianza que se transporta.</h2>
+
+          <div class="card-grid">
+            <div class="card reveal">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 6v5c0 5-3.5 9-8 11-4.5-2-8-6-8-11V6l8-4Z"/><path d="M9 12l2 2 4-4.5"/></svg>
+              </div>
+              <h3 class="card__title">Seguridad</h3>
+              <p class="card__text">Protocolos y seguros vigentes en cada envío.</p>
             </div>
-            <h3 class="card__title">Seguridad</h3>
-            <p class="card__text">Protocolos y seguros vigentes en cada envío.</p>
-          </div>
-          <div class="card reveal">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.5 11 15l4.5-5.5"/><rect x="3.5" y="3.5" width="17" height="17" rx="4"/></svg>
+            <div class="card reveal">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12.5 11 15l4.5-5.5"/><rect x="3.5" y="3.5" width="17" height="17" rx="4"/></svg>
+              </div>
+              <h3 class="card__title">Cumplimiento</h3>
+              <p class="card__text">Entregas a tiempo, sin excepciones.</p>
             </div>
-            <h3 class="card__title">Cumplimiento</h3>
-            <p class="card__text">Entregas a tiempo, sin excepciones.</p>
-          </div>
-          <div class="card reveal">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+            <div class="card reveal">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+              </div>
+              <h3 class="card__title">Experiencia</h3>
+              <p class="card__text">Años moviendo carga por el país.</p>
             </div>
-            <h3 class="card__title">Experiencia</h3>
-            <p class="card__text">Años moviendo carga por el país.</p>
-          </div>
-          <div class="card reveal">
-            <div class="icon-wrap" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>
+            <div class="card reveal">
+              <div class="icon-wrap" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></svg>
+              </div>
+              <h3 class="card__title">Eficiencia</h3>
+              <p class="card__text">Rutas optimizadas y procesos ágiles.</p>
             </div>
-            <h3 class="card__title">Eficiencia</h3>
-            <p class="card__text">Rutas optimizadas y procesos ágiles.</p>
           </div>
         </div>
       </div>
